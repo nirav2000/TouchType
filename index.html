@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KeyQuest — Learn to Type</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%8C%A8%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#4f6df5">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <button class="brand" id="btn-home" title="Home">⌨️ <span>KeyQuest</span></button>
+    <div class="topbar-right">
+      <button id="btn-sound" class="icon-btn" title="Sound on/off">🔊</button>
+      <button id="btn-profile" class="profile-chip" title="Switch typist"><span id="chip-avatar"></span><span id="chip-name"></span></button>
+    </div>
+  </header>
+
+  <div id="capslock" class="capslock" hidden>🔒 Caps Lock is on! Press it once to turn it off.</div>
+  <main id="screens">
+
+    <!-- Profiles -->
+    <section id="screen-profiles" class="screen">
+      <h1 class="big-title">Who's typing today?</h1>
+      <div id="profile-list" class="profile-list"></div>
+      <div class="card new-profile">
+        <h2>New typist</h2>
+        <div class="avatar-picker" id="avatar-picker"></div>
+        <div class="eyebrow">How old are you?</div>
+        <div class="level-picker" id="level-picker"></div>
+        <div class="row">
+          <input id="new-name" type="text" maxlength="20" placeholder="Your name" autocomplete="off">
+          <button id="btn-create" class="btn primary">Let's go!</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Home -->
+    <section id="screen-home" class="screen">
+      <h1 class="big-title" id="home-greeting">Hi!</h1>
+      <div class="card continue-card" id="home-continue">
+        <div>
+          <div class="eyebrow">Up next</div>
+          <div class="continue-title" id="continue-title"></div>
+          <div class="muted" id="continue-sub"></div>
+        </div>
+        <button id="btn-continue" class="btn primary big">Start lesson ▶</button>
+      </div>
+      <div class="card weak-card" id="home-weak" hidden>
+        <div>
+          <div class="eyebrow">Tricky keys</div>
+          <div class="continue-title">Let's practice <span id="weak-keys"></span></div>
+          <div class="muted">A short workout on the keys you miss most.</div>
+        </div>
+        <button id="btn-weak" class="btn primary">Practice ▶</button>
+      </div>
+      <div class="nav-grid">
+        <button class="nav-card" id="nav-lessons"><span class="nav-icon">📚</span><span>Lessons</span></button>
+        <button class="nav-card" id="nav-games"><span class="nav-icon">🎮</span><span>Games</span></button>
+        <button class="nav-card" id="nav-test"><span class="nav-icon">⏱️</span><span>Speed Test</span></button>
+        <button class="nav-card" id="nav-progress"><span class="nav-icon">⭐</span><span>My Progress</span></button>
+        <button class="nav-card" id="nav-settings"><span class="nav-icon">⚙️</span><span>Settings</span></button>
+      </div>
+    </section>
+
+    <!-- Lessons -->
+    <section id="screen-lessons" class="screen">
+      <div class="screen-head"><h1>Lessons</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <div id="lesson-grid" class="lesson-grid"></div>
+    </section>
+
+    <!-- Lesson intro -->
+    <section id="screen-intro" class="screen">
+      <div class="card intro-card">
+        <div class="eyebrow" id="intro-number"></div>
+        <h1 id="intro-title"></h1>
+        <div id="intro-keys" class="intro-keys"></div>
+        <p id="intro-tip" class="intro-tip"></p>
+        <ul id="intro-checklist" class="intro-checklist" hidden></ul>
+        <div id="intro-fingers" class="intro-fingers"></div>
+        <div id="intro-hands" class="intro-hands"></div>
+        <div class="row center">
+          <button class="btn ghost" data-go="lessons">← Back</button>
+          <button id="btn-start-lesson" class="btn primary big">Start ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Practice -->
+    <section id="screen-practice" class="screen">
+      <div class="practice-head">
+        <div>
+          <div class="eyebrow" id="practice-sub"></div>
+          <h2 id="practice-title"></h2>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="stat-val" id="stat-wpm">0</span><span class="stat-label">WPM</span></div>
+          <div class="stat"><span class="stat-val" id="stat-acc">100%</span><span class="stat-label">Accuracy</span></div>
+          <div class="stat"><span class="stat-val" id="stat-time">0:00</span><span class="stat-label" id="stat-time-label">Time</span></div>
+        </div>
+      </div>
+      <div class="progress-bar"><div id="practice-progress" class="progress-fill"></div></div>
+      <div id="text-display" class="text-display" tabindex="0"></div>
+      <div id="hint-line" class="hint-line"></div>
+      <div class="kb-area">
+        <div id="kb-practice"></div>
+        <div id="hands-practice" class="hands-wrap"></div>
+      </div>
+      <div class="row center practice-actions">
+        <button id="btn-restart" class="btn ghost">↻ Restart</button>
+        <button id="btn-quit" class="btn ghost">✕ Quit</button>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section id="screen-results" class="screen">
+      <div class="card results-card">
+        <div class="eyebrow" id="results-eyebrow"></div>
+        <h1 id="results-title"></h1>
+        <div id="results-stars" class="stars"></div>
+        <div class="results-grid">
+          <div class="stat"><span class="stat-val" id="results-wpm">0</span><span class="stat-label">WPM</span></div>
+          <div class="stat"><span class="stat-val" id="results-acc">0%</span><span class="stat-label">Accuracy</span></div>
+          <div class="stat"><span class="stat-val" id="results-errors">0</span><span class="stat-label">Mistakes</span></div>
+          <div class="stat"><span class="stat-val" id="results-time">0s</span><span class="stat-label">Time</span></div>
+        </div>
+        <p id="results-message" class="results-message"></p>
+        <div class="row center">
+          <button id="btn-results-back" class="btn ghost">Lessons</button>
+          <button id="btn-results-retry" class="btn ghost">↻ Try again</button>
+          <button id="btn-results-next" class="btn primary big">Next ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Games -->
+    <section id="screen-games" class="screen">
+      <div class="screen-head"><h1>Games</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <div class="card game-card">
+        <div class="game-icon">🌧️</div>
+        <div class="game-info">
+          <h2>Letter Rain</h2>
+          <p>Words fall from the sky. Type them before they hit the ground! Best score: <strong id="rain-best">0</strong></p>
+          <div class="row wrap">
+            <button class="btn primary" data-rain="home">Home row</button>
+            <button class="btn primary" data-rain="letters">All letters</button>
+            <button class="btn primary" data-rain="all">Everything</button>
+          </div>
+        </div>
+      </div>
+      <div class="card game-card">
+        <div class="game-icon">🚀</div>
+        <div class="game-info">
+          <h2>Rocket Race</h2>
+          <p>Type the passage to beat Robo's rocket to the finish line. Best speed: <strong id="race-best">0</strong> WPM</p>
+          <div class="row wrap">
+            <button class="btn primary" data-race="slow">Slow Robo (10 WPM)</button>
+            <button class="btn primary" data-race="medium">Medium Robo (20 WPM)</button>
+            <button class="btn primary" data-race="fast">Fast Robo (35 WPM)</button>
+          </div>
+        </div>
+      </div>
+      <div class="card game-card">
+        <div class="game-icon">🫧</div>
+        <div class="game-info">
+          <h2>Bubble Pop</h2>
+          <p>Letters float up in bubbles. Press the right key to pop them before they escape! Best score: <strong id="bubbles-best">0</strong></p>
+          <div class="row wrap">
+            <button class="btn primary" data-bubbles="home">Home row</button>
+            <button class="btn primary" data-bubbles="letters">All letters</button>
+            <button class="btn primary" data-bubbles="all">Capitals &amp; numbers</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Letter Rain -->
+    <section id="screen-rain" class="screen">
+      <div class="rain-hud">
+        <div class="stat"><span class="stat-val" id="rain-score">0</span><span class="stat-label">Score</span></div>
+        <div class="stat"><span class="stat-val" id="rain-level">1</span><span class="stat-label">Level</span></div>
+        <div class="stat"><span class="stat-val" id="rain-lives">❤️❤️❤️❤️❤️</span><span class="stat-label">Lives</span></div>
+        <button id="btn-rain-quit" class="btn ghost">✕ Quit</button>
+      </div>
+      <div id="rain-area" class="rain-area">
+        <div id="rain-overlay" class="rain-overlay">
+          <h2 id="rain-overlay-title">Letter Rain</h2>
+          <p id="rain-overlay-text">Type the falling words. Press any key to start!</p>
+          <button id="btn-rain-start" class="btn primary big">Play ▶</button>
+        </div>
+        <div class="rain-ground"></div>
+      </div>
+    </section>
+
+    <!-- Rocket Race -->
+    <section id="screen-race" class="screen">
+      <div class="rain-hud">
+        <div class="stat"><span class="stat-val" id="race-wpm">0</span><span class="stat-label">WPM</span></div>
+        <div class="stat"><span class="stat-val" id="race-robo-wpm">0</span><span class="stat-label">Robo WPM</span></div>
+        <button id="btn-race-quit" class="btn ghost">✕ Quit</button>
+      </div>
+      <div class="race-track card">
+        <div class="race-lane"><span class="race-label">You</span><div class="race-bar"><span id="race-player" class="race-rocket">🚀</span></div><span class="race-flag">🏁</span></div>
+        <div class="race-lane"><span class="race-label">Robo</span><div class="race-bar"><span id="race-robo" class="race-rocket">🛸</span></div><span class="race-flag">🏁</span></div>
+        <div id="race-countdown" class="race-countdown"></div>
+      </div>
+      <div class="race-text-wrap">
+        <div id="race-text" class="text-display small"></div>
+        <div id="race-overlay" class="rain-overlay">
+          <h2 id="race-overlay-title">Rocket Race</h2>
+          <p id="race-overlay-text">Type the passage faster than Robo to win. Press Play or any key to start!</p>
+          <button id="btn-race-start" class="btn primary big">Play ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bubble Pop -->
+    <section id="screen-bubbles" class="screen">
+      <div class="rain-hud">
+        <div class="stat"><span class="stat-val" id="bubbles-score">0</span><span class="stat-label">Score</span></div>
+        <div class="stat"><span class="stat-val" id="bubbles-level">1</span><span class="stat-label">Level</span></div>
+        <div class="stat"><span class="stat-val" id="bubbles-lives">❤️❤️❤️❤️❤️</span><span class="stat-label">Lives</span></div>
+        <button id="btn-bubbles-quit" class="btn ghost">✕ Quit</button>
+      </div>
+      <div id="bubbles-area" class="rain-area bubbles-area">
+        <div id="bubbles-overlay" class="rain-overlay">
+          <h2 id="bubbles-overlay-title">Bubble Pop</h2>
+          <p id="bubbles-overlay-text">Press the letter in each bubble before it floats away. Press Play or any key to start!</p>
+          <button id="btn-bubbles-start" class="btn primary big">Play ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Progress -->
+    <section id="screen-progress" class="screen">
+      <div class="screen-head"><h1>My Progress</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <div class="results-grid card" id="progress-summary"></div>
+      <div class="card">
+        <h2>Key accuracy</h2>
+        <p class="muted">Green keys are your friends. Red keys need some practice.</p>
+        <div id="kb-heat"></div>
+        <div class="heat-legend"><span class="heat-good">95%+</span><span class="heat-ok">85–94%</span><span class="heat-bad">below 85%</span><span class="heat-none">not yet</span></div>
+      </div>
+      <div class="card">
+        <h2>Lessons</h2>
+        <div class="table-wrap"><table id="progress-lessons"></table></div>
+      </div>
+      <div class="card">
+        <h2>Recent activity</h2>
+        <div class="table-wrap"><table id="progress-history"></table></div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section id="screen-settings" class="screen">
+      <div class="screen-head"><h1>Settings</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <div class="card">
+        <label class="toggle"><span>Skill level <small>Changes speed targets, exercise length and game speed.</small></span>
+          <select id="set-level"></select></label>
+        <label class="toggle"><input type="checkbox" id="set-sound"><span>Sound effects</span></label>
+        <label class="toggle"><input type="checkbox" id="set-stop"><span>Wait for the right key after a mistake <small>(off: keep going, fix with Backspace)</small></span></label>
+        <label class="toggle"><input type="checkbox" id="set-keyboard"><span>Show on-screen keyboard</span></label>
+        <label class="toggle"><input type="checkbox" id="set-hands"><span>Show hands</span></label>
+        <label class="toggle"><input type="checkbox" id="set-unlock"><span>Unlock all lessons <small>(for grown-ups; normally a lesson needs 2 stars to unlock the next)</small></span></label>
+      </div>
+      <div class="card">
+        <h2>Backup</h2>
+        <p class="muted">Progress is saved in this browser only. Export a backup to move it to another computer.</p>
+        <div class="row wrap">
+          <button id="btn-export" class="btn">⬇ Export progress</button>
+          <button id="btn-import" class="btn">⬆ Import progress</button>
+          <input type="file" id="import-file" accept="application/json" hidden>
+        </div>
+      </div>
+      <div class="card danger-zone">
+        <h2>Danger zone</h2>
+        <div class="row wrap">
+          <button id="btn-delete-profile" class="btn danger">Delete this typist</button>
+          <button id="btn-reset-all" class="btn danger">Erase everything</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <footer class="footer">KeyQuest is free and open source. Made with ❤️ for kids learning to type.</footer>
+</div>
+
+<script src="js/data/words.js"></script>
+<script src="js/data/lessons.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/keyboard.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/game.js"></script>
+<script src="js/race.js"></script>
+<script src="js/bubbles.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

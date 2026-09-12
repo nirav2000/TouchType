@@ -1,0 +1,14 @@
+{
+  "name": "keyquest",
+  "version": "1.0.0",
+  "description": "A free, open-source typing tutor for kids that runs entirely in the browser.",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node tests/e2e.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.60.0"
+  },
+  "license": "MIT"
+}
