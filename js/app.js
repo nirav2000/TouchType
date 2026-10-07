@@ -217,7 +217,7 @@
   function startLesson(lesson) {
     state.mode = "lesson";
     state.lesson = lesson;
-    state.exercises = KQ.buildExercises(lesson, level());
+    state.exercises = KQ.buildExercises(lesson, level(), state.profile);
     state.exIndex = 0;
     state.exResults = [];
     startExercise();
@@ -389,7 +389,7 @@
     stopTimer();
     const s = state.session;
     const st = s.stats();
-    store.mergeKeyStats(state.profile, s.keyStats);
+    store.recordAdaptiveSession(state.profile, s);
     state.keyboard.clearHighlight();
     KQ.highlightFinger($("hands-practice"), null);
 
@@ -481,19 +481,25 @@
   }
 
   function aggregate(results) {
+    const timing = results.filter((r) => r.timingSamples > 0);
+    const timingSamples = timing.reduce((a, r) => a + r.timingSamples, 0);
     return {
       wpm: Math.round(results.reduce((a, r) => a + r.wpm, 0) / results.length),
       accuracy: Math.round(results.reduce((a, r) => a + r.accuracy, 0) / results.length),
       errors: results.reduce((a, r) => a + r.errors, 0),
       seconds: results.reduce((a, r) => a + r.seconds, 0),
+      timingSamples,
+      avgLatencyMs: timingSamples ? Math.round(timing.reduce((a, r) => a + r.avgLatencyMs * r.timingSamples, 0) / timingSamples) : 0,
+      hesitationRate: timingSamples ? Math.round(timing.reduce((a, r) => a + r.hesitationRate * r.timingSamples, 0) / timingSamples) : 0,
     };
   }
 
   function encouragement(st, target) {
     if (st.accuracy < 85) return "Accuracy first, speed later. Try slowing down a little.";
     if (st.accuracy < 92) return "Almost there. A little more care will earn more stars.";
+    if ((st.hesitationRate || 0) >= 15) return "Accurate — now make the reaches smoother. A few keys still make you pause.";
     if (st.wpm < target) return `Great accuracy! Aim for ${target} WPM to earn more stars.`;
-    return "Fast and accurate. Keep it up!";
+    return "Fast, accurate and smooth. Keep it up!";
   }
 
   function showResults(r) {
