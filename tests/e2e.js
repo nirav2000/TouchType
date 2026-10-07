@@ -72,6 +72,17 @@ function check(name, cond) {
     });
     check(`all ${gen.total} generated exercises use only taught keys`, gen.bad === 0);
     check("24 lessons", gen.lessons === 24);
+    const adaptive = await page.evaluate(() => {
+      const p = { wordSkills: {}, keyStats: {}, transitionStats: {} };
+      const lesson = KQ.LESSONS[6];
+      const ex = KQ.buildExercises(lesson, "kid", p);
+      const acquisition = ex.find((x) => x.acquisition);
+      const counts = acquisition ? acquisition.text.split(" ").reduce((m, w) => ((m[w] = (m[w] || 0) + 1), m), {}) : {};
+      return { title: lesson.title, hasAcquisition: !!acquisition, counts };
+    });
+    check("G and H come before E and I", adaptive.title === "G and H");
+    check("adaptive lesson contains acquisition drill", adaptive.hasAcquisition);
+    check("acquisition words repeat five times", Object.values(adaptive.counts).every((n) => n === 5));
 
     console.log("Profiles and home");
     await page.click("#level-picker button:nth-child(1)");
