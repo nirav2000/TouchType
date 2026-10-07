@@ -42,6 +42,7 @@
     <!-- Home -->
     <section id="screen-home" class="screen">
       <h1 class="big-title" id="home-greeting">Hi!</h1>
+      <div id="focus-home-note" class="focus-home-note" hidden><span>◎ Focus mode</span><strong>Today's practice only</strong><span class="muted">Extra activities are tucked away. Progress and Settings stay available.</span></div>
       <div class="card continue-card adaptive-card" id="home-continue">
         <div>
           <div class="eyebrow">Today's adaptive practice</div>
@@ -309,7 +310,7 @@
         <label class="toggle"><input type="checkbox" id="set-stop"><span>Wait for the right key after a mistake <small>(off: keep going, fix with Backspace)</small></span></label>
         <label class="toggle"><input type="checkbox" id="set-keyboard"><span>Show on-screen keyboard</span></label>
         <label class="toggle"><input type="checkbox" id="set-hands"><span>Show hands</span></label>
-        <label class="toggle"><input type="checkbox" id="set-focus"><span>Focus mode <small>Hide navigation, live speed and optional visual aids while typing. Accuracy feedback remains.</small></span></label>
+        <label class="toggle"><input type="checkbox" id="set-focus"><span>Focus mode <small>Simplify Home to today's practice, Progress and Settings; during typing hide optional visual aids while keeping Home/back/quit available.</small></span></label>
         <label class="toggle"><span>Spaced review system <small>Adaptive uses delayed retention, accuracy and fluency to choose the next interval. Classic uses the original fixed ladder.</small></span>
           <select id="set-srs"><option value="adaptive">Adaptive motor SRS</option><option value="ladder">Classic 1 · 3 · 7 · 14 · 30 days</option></select></label>
         <label class="toggle"><input type="checkbox" id="set-unlock"><span>Unlock all lessons <small>(for grown-ups; normally a lesson needs 2 stars to unlock the next)</small></span></label>
