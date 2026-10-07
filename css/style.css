@@ -349,3 +349,24 @@ body.focus-mode:has(#screen-practice.active) .topbar{justify-content:flex-end;pa
 body.focus-mode:has(#screen-practice.active) #btn-focus{display:block}
 body.focus-mode #screen-practice .text-display{font-size:2.15rem;line-height:1.8;padding:34px 38px;min-height:150px}
 @media(max-width:640px){body.focus-mode #screen-practice .text-display{font-size:1.55rem;padding:24px}}
+
+/* Detailed analytics dashboard */
+.analytics-head{align-items:flex-start}
+.analytics-head h1{margin-bottom:5px}
+.analytics-summary{margin-bottom:16px}
+.analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chart-card{overflow:hidden}
+.chart-host{width:100%;min-height:250px;margin-top:8px}
+.chart-host.wide{min-height:280px}
+.analytics-svg{display:block;width:100%;height:auto;overflow:visible}
+.chart-grid{stroke:var(--line);stroke-width:1}
+.chart-axis{stroke:var(--muted);stroke-width:1.2}
+.chart-label{fill:var(--muted);font-size:12px;font-family:var(--font)}
+.chart-series{stroke:var(--primary);stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.chart-series.series-1{stroke:#f59e0b}
+.chart-point{fill:var(--card);stroke:var(--primary);stroke-width:3}
+.chart-point.series-1{stroke:#f59e0b}
+.chart-bar{fill:var(--primary);opacity:.82}
+.chart-bar:hover{opacity:1}
+.chart-empty{fill:var(--muted);font-size:16px}
+@media(max-width:780px){.analytics-grid{grid-template-columns:1fr}.analytics-head{align-items:stretch}.analytics-head>.row{justify-content:space-between}}
