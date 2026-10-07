@@ -110,6 +110,8 @@
     $("btn-focus").setAttribute("aria-pressed", String(on));
     $("btn-focus").classList.toggle("active", on);
     $("btn-focus").title = on ? "Leave focus mode" : "Focus mode";
+    const note = $("focus-home-note");
+    if (note) note.hidden = !on;
   }
 
   function updateChip() {
