@@ -299,7 +299,14 @@
   <footer class="footer">TouchType is free and open source. Made with ❤️ for kids learning to type.</footer>
 </div>
 
-<script src="https://nirav2000.github.io/Apps/platform/v1/loader.js" data-app-manifest="./apps-manifest.json"></script>
+<script>
+  if (!["localhost","127.0.0.1"].includes(location.hostname)) {
+    const platform = document.createElement("script");
+    platform.src = "https://nirav2000.github.io/Apps/platform/v1/loader.js";
+    platform.dataset.appManifest = "./apps-manifest.json";
+    document.head.appendChild(platform);
+  }
+</script>
 <script src="js/data/words.js"></script>
 <script src="js/data/lessons.js"></script>
 <script src="js/engine.js"></script>
