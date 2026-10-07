@@ -115,7 +115,7 @@ function check(name, cond) {
     await page.click("#screen-progress [data-go=home]");
     await page.click("#nav-analytics");
     check("separate analytics dashboard opens", await page.$eval("#screen-analytics",e=>e.classList.contains("active")));
-    check("analytics renders three charts", (await page.$(".analytics-svg")).length === 3);
+    check("analytics renders three charts", (await page.evaluate(() => document.querySelectorAll(".analytics-svg").length)) === 3);
     check("analytics includes per-key diagnostics", /Avg latency/.test(await page.$eval("#analytics-keys-table",e=>e.innerText)));
     check("analytics includes SRS mastery table", /Retention/.test(await page.$eval("#analytics-words-table",e=>e.innerText)));
     await page.selectOption("#analytics-range","all");
