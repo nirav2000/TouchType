@@ -110,6 +110,52 @@ const UNIT_LEN = [60, 85, 105, 125, 0];
 
 KQ.targetWpm = (lesson, level) => Math.max(5, Math.round(lesson.baseWpm * KQ.levelInfo(level).wpm));
 
+// Adaptive TouchType curriculum. This is the primary learning path; the original
+// KeyQuest lessons remain available as optional structured practice.
+KQ.ADAPTIVE_STAGES = [
+  { id: "home-gh", title: "Home row fluency + G/H", newKeys: "gh", allowed: "asdfghjkl; ", note: "Keep A S D F and J K L ; anchored. Reach to G/H and come straight home." },
+  { id: "ei", title: "Add E and I", newKeys: "ei", allowed: "asdfghjkl; ei", note: "Middle fingers reach up to E/I, then return home." },
+  { id: "ru", title: "Add R and U", newKeys: "ru", allowed: "asdfghjkl; eiru", note: "Index fingers reach up to R/U without moving the whole hand." },
+  { id: "ty", title: "Add T and Y", newKeys: "ty", allowed: "asdfghjkl; eiruty", note: "Stretch inward to T/Y, then re-anchor on F/J." },
+  { id: "wo", title: "Add W and O", newKeys: "wo", allowed: "asdfghjkl; eirutywo", note: "Ring fingers reach up to W/O." },
+  { id: "nm", title: "Add N and M", newKeys: "nm", allowed: "asdfghjkl; eirutywonm", note: "Index fingers reach down to N/M and return home." },
+  { id: "cv", title: "Add C and V", newKeys: "cv", allowed: "asdfghjkl; eirutywonmcv", note: "Middle/index fingers reach down to C/V." },
+  { id: "b", title: "Add B", newKeys: "b", allowed: "asdfghjkl; eirutywonmcvb", note: "Reach B with the index finger while keeping the hand centred." },
+  { id: "pq", title: "Add P and Q", newKeys: "pq", allowed: "asdfghjkl; eirutywonmcvbpq", note: "Pinkies reach up to P/Q, then return to home." },
+  { id: "xz", title: "Add X and Z", newKeys: "xz", allowed: "abcdefghijklmnopqrstuvwxyz; ", note: "Finish the alphabet with X/Z while preserving rhythm." },
+];
+
+KQ.adaptiveStageFor = function(profile) {
+  const index = Math.max(0, Math.min(KQ.ADAPTIVE_STAGES.length - 1, Number(profile?.adaptiveStage || 0)));
+  const raw = KQ.ADAPTIVE_STAGES[index];
+  return {...raw, index, allowedSet: new Set(raw.allowed)};
+};
+
+KQ.adaptiveStageStatus = function(profile) {
+  const stage = KQ.adaptiveStageFor(profile);
+  const keyDetails = [...stage.newKeys].map((ch) => {
+    const s = profile?.keyStats?.[ch] || {};
+    const accuracy = s.attempts ? ((s.attempts - (s.errors || 0)) / s.attempts) * 100 : 0;
+    const latency = s.samples ? (s.totalLatencyMs || 0) / s.samples : Infinity;
+    const hesitation = s.samples ? ((s.slow || 0) / s.samples) * 100 : 100;
+    return {ch, attempts:s.attempts || 0, accuracy, latency, hesitation};
+  });
+  const stageWords = Object.entries(profile?.wordSkills || {}).filter(([word]) =>
+    [...word].every((ch) => stage.allowedSet.has(ch)) &&
+    [...stage.newKeys].some((ch) => word.includes(ch))
+  );
+  const masteredWords = stageWords.filter(([,s]) => (s.stage || 0) >= 2).length;
+  const keysReady = keyDetails.every((k) => k.attempts >= 20 && k.accuracy >= 95 && k.latency <= 900 && k.hesitation <= 15);
+  return {
+    stage,
+    keyDetails,
+    masteredWords,
+    ready: keysReady && masteredWords >= 5,
+    wordGoal: 5,
+  };
+};
+
+
 // ---------- helpers ----------
 const rand = (n) => Math.floor(Math.random() * n);
 const pick = (arr) => arr[rand(arr.length)];
@@ -267,7 +313,7 @@ function exAcquire(words, must, allowed, len, profile) {
   const targets = pool.slice(0, targetCount);
   const repeated = [];
   for (const word of targets) for (let i = 0; i < 5; i++) repeated.push(word);
-  return { name: "Make these automatic", text: joinToLength(repeated, Math.max(len, repeated.join(" ").length)), targets, acquisition: true };
+  return { name: "Make these automatic", text: repeated.join(" "), targets, acquisition: true };
 }
 
 function exAdaptiveSentences(sentences, words, allowed, must, len, profile) {
@@ -396,6 +442,66 @@ KQ.buildExercises = function (lesson, level, profile) {
     case "story": return buildStory(lesson, len);
   }
   return [];
+};
+
+
+KQ.buildAdaptivePlan = function(profile) {
+  const stage = KQ.adaptiveStageFor(profile);
+  const allowed = stage.allowedSet;
+  const focusWords = wordsFor(allowed)
+    .filter((w) => w.length >= 2 && [...stage.newKeys].some((ch) => w.includes(ch)));
+  const due = KQ.store?.dueWords ? KQ.store.dueWords(profile, allowed, 12) : [];
+  const skills = profile?.wordSkills || {};
+  const unseen = focusWords.filter((w) => !skills[w]);
+  const weak = focusWords.filter((w) => {
+    const s = skills[w];
+    return s && ((s.stage || 0) < 2 || (s.attempts && s.errors / s.attempts > 0.08));
+  });
+  const ordered = [...new Set(due.filter((w) => focusWords.includes(w)).concat(weak, unseen, focusWords))];
+  const targets = ordered.slice(0, 4);
+  const reps = {};
+  for (const word of targets) {
+    const s = skills[word];
+    reps[word] = !s ? 5 : ((s.stage || 0) < 2 || (s.attempts && s.errors / s.attempts > 0.08)) ? 3 : 1;
+  }
+  const acquisition = [];
+  for (const word of targets) for (let i=0;i<reps[word];i++) acquisition.push(word);
+
+  const sentences = sentencesFor(allowed).filter((s) => targets.some((w) => s.includes(w)));
+  const sentenceText = shuffle(sentences).slice(0, 4).join(" ");
+  const mixedPool = [...new Set(targets.concat(due, focusWords))];
+  const mixed = shuffle(mixedPool).slice(0, Math.min(14, mixedPool.length));
+
+  const exercises = [
+    {
+      name: "Build the pattern",
+      text: acquisition.join(" "),
+      acquisition: true,
+      targets,
+      repetitions: reps,
+    },
+    {
+      name: "Use it in real sentences",
+      text: sentenceText || targets.join(" "),
+      transfer: true,
+      targets,
+    },
+    {
+      name: "Mixed recall",
+      text: mixed.join(" "),
+      recall: true,
+      targets,
+    },
+  ].filter((x) => x.text);
+
+  return {
+    stage,
+    targets,
+    repetitions: reps,
+    dueCount: due.length,
+    exercises,
+    status: KQ.adaptiveStageStatus(profile),
+  };
 };
 
 // ---------- weak-key practice ----------
