@@ -330,3 +330,22 @@ select { font: inherit; font-weight: 700; padding: 8px 12px; border-radius: 10px
 .results-note{margin:12px auto 18px;max-width:650px;padding:11px 13px;border-radius:12px;background:var(--surface2,#f3f6f8);font-size:.9rem}
 .results-note.stop-note{border:1px solid #d6a647}
 @media(max-width:720px){.progress-two{grid-template-columns:1fr}}
+
+/* Focus mode: preserve typing feedback, remove optional distractions. */
+#btn-focus.active{background:#dbeafe;box-shadow:0 0 0 2px var(--primary)}
+body.focus-mode #screen-practice .stats .stat:first-child,
+body.focus-mode #screen-practice #stat-time,
+body.focus-mode #screen-practice #stat-time-label,
+body.focus-mode #screen-practice .kb-area,
+body.focus-mode #screen-practice .hint-line,
+body.focus-mode #screen-practice .practice-actions,
+body.focus-mode #screen-practice .progress-bar{display:none}
+body.focus-mode:has(#screen-practice.active) .topbar .brand,
+body.focus-mode:has(#screen-practice.active) #btn-sound,
+body.focus-mode:has(#screen-practice.active) #btn-profile,
+body.focus-mode:has(#screen-practice.active) .footer{display:none}
+body.focus-mode:has(#screen-practice.active) #app{max-width:900px;padding-top:28px}
+body.focus-mode:has(#screen-practice.active) .topbar{justify-content:flex-end;padding:0 0 12px}
+body.focus-mode:has(#screen-practice.active) #btn-focus{display:block}
+body.focus-mode #screen-practice .text-display{font-size:2.15rem;line-height:1.8;padding:34px 38px;min-height:150px}
+@media(max-width:640px){body.focus-mode #screen-practice .text-display{font-size:1.55rem;padding:24px}}
