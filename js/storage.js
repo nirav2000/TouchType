@@ -12,6 +12,8 @@ KQ.DEFAULT_SETTINGS = {
   unlockAll: false,
   showKeyboard: true,
   showHands: true,
+  focusMode: false,
+  srsMode: "adaptive",
   level: "kid",
 };
 
@@ -26,6 +28,34 @@ function ensureAdaptive(profile) {
 
 function reviewDelayDays(stage) {
   return [0, 1, 3, 7, 14, 30][Math.max(0, Math.min(5, stage))];
+}
+
+function adaptiveDelayDays(cur, sample, now) {
+  const lastSeen = cur.lastSeen ? new Date(cur.lastSeen).getTime() : null;
+  const elapsedDays = lastSeen ? Math.max(0, (now - lastSeen) / 86400000) : 0;
+  const avgMs = sample.samples ? sample.totalMs / sample.samples : Infinity;
+  const clean = (sample.errors || 0) === 0;
+  const fast = avgMs <= Math.max(1100, sample.wordLength * 420);
+  const adequate = avgMs <= Math.max(1800, sample.wordLength * 650);
+
+  cur.retention = Number.isFinite(cur.retention) ? cur.retention : 0.55;
+  cur.stabilityDays = Number.isFinite(cur.stabilityDays) ? cur.stabilityDays : 1;
+
+  const dueWasRespected = !lastSeen || elapsedDays >= Math.max(0.5, cur.stabilityDays * 0.7);
+  if (clean && fast && dueWasRespected) {
+    cur.retention = Math.min(0.99, cur.retention + 0.09);
+    cur.stabilityDays = Math.min(90, Math.max(1, cur.stabilityDays * (1.45 + cur.retention * 0.7)));
+  } else if (clean && adequate) {
+    cur.retention = Math.min(0.97, cur.retention + (dueWasRespected ? 0.05 : 0.015));
+    cur.stabilityDays = Math.min(60, Math.max(1, cur.stabilityDays * (dueWasRespected ? 1.25 : 1.05)));
+  } else {
+    cur.retention = Math.max(0.2, cur.retention - 0.16);
+    cur.stabilityDays = Math.max(0.5, cur.stabilityDays * 0.55);
+  }
+
+  const targetRecall = 0.9;
+  const recallFactor = Math.max(0.55, Math.min(1.5, cur.retention / targetRecall));
+  return Math.max(0.5, Math.min(90, cur.stabilityDays * recallFactor));
 }
 
 KQ.store = {
@@ -123,18 +153,19 @@ KQ.store = {
   mergeWordStats(profile, wordStats) {
     ensureAdaptive(profile);
     const now = Date.now();
+    const mode = this.settings(profile).srsMode || "adaptive";
     for (const [word, s] of Object.entries(wordStats || {})) {
       if (!s.samples) continue;
       const cur = (profile.wordSkills[word] = profile.wordSkills[word] || {
         attempts: 0, errors: 0, totalMs: 0, samples: 0, bestMs: null,
-        stage: 0, due: now, lastSeen: null,
+        stage: 0, due: now, lastSeen: null, retention: 0.55, stabilityDays: 1,
       });
+      const previousLastSeen = cur.lastSeen;
       cur.attempts += s.attempts || 0;
       cur.errors += s.errors || 0;
       cur.totalMs += s.totalMs || 0;
       cur.samples += s.samples || 0;
       cur.bestMs = cur.bestMs == null ? s.bestMs : Math.min(cur.bestMs, s.bestMs == null ? cur.bestMs : s.bestMs);
-      cur.lastSeen = new Date(now).toISOString();
 
       const avgMs = s.samples ? s.totalMs / s.samples : Infinity;
       const clean = (s.errors || 0) === 0;
@@ -144,7 +175,16 @@ KQ.store = {
       if (fluent) cur.stage = Math.min(5, (cur.stage || 0) + 1);
       else if (!adequate || (s.errors || 0) > 0) cur.stage = Math.max(0, (cur.stage || 0) - 1);
 
-      const delay = reviewDelayDays(cur.stage || 0);
+      let delay;
+      if (mode === "ladder") {
+        delay = reviewDelayDays(cur.stage || 0);
+      } else {
+        cur.lastSeen = previousLastSeen;
+        delay = adaptiveDelayDays(cur, {...s, wordLength:word.length}, now);
+      }
+      cur.lastIntervalDays = delay;
+      cur.scheduler = mode;
+      cur.lastSeen = new Date(now).toISOString();
       cur.due = now + delay * 86400000;
     }
     this.save();
