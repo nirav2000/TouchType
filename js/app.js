@@ -128,13 +128,17 @@
     const hour = new Date().getHours();
     const hello = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
     $("home-greeting").textContent = `${hello}, ${p.name}! ${p.avatar}`;
-    const lesson = nextLesson();
-    const rec = p.lessons[lesson.id];
-    $("continue-title").textContent = `Lesson ${lesson.id}: ${lesson.title}`;
-    $("continue-sub").textContent = rec
-      ? `Best: ${rec.bestWpm} WPM · ${rec.bestAcc}% accuracy · ${starString(rec.stars)}${rec.stars < KQ.MASTERY_STARS ? " · earn 2 stars to move on" : ""}`
-      : `Not started yet · goal ${KQ.targetWpm(lesson, level())} WPM`;
-    $("btn-continue").onclick = () => openIntro(lesson);
+    const plan = KQ.buildAdaptivePlan(p);
+    const status = plan.status;
+    $("continue-title").textContent = plan.stage.title;
+    const targetText = plan.targets.length ? plan.targets.map((w) => {
+      const n = plan.repetitions[w] || 1;
+      return n > 1 ? `${w} ×${n}` : w;
+    }).join(" · ") : "Building your next practice set";
+    $("continue-sub").textContent = targetText;
+    $("adaptive-meta").innerHTML =
+      `<span>${plan.dueCount} due for review</span><span>${status.masteredWords}/${status.wordGoal} focus words fluent</span><span>${status.ready ? "Ready to progress" : "Mastery first"}</span>`;
+    $("btn-continue").onclick = startAdaptivePractice;
 
     const weak = weakKeys();
     $("home-weak").hidden = weak.length < 1;
@@ -214,6 +218,17 @@
   }
 
   // ---------- practice ----------
+  function startAdaptivePractice() {
+    const plan = KQ.buildAdaptivePlan(state.profile);
+    state.mode = "adaptive";
+    state.lesson = null;
+    state.adaptivePlan = plan;
+    state.exercises = plan.exercises;
+    state.exIndex = 0;
+    state.exResults = [];
+    startExercise();
+  }
+
   function startLesson(lesson) {
     state.mode = "lesson";
     state.lesson = lesson;
@@ -235,7 +250,7 @@
 
   function startExercise() {
     const ex = state.exercises[state.exIndex];
-    const prefix = state.mode === "weak" ? "Tricky keys" : `Lesson ${state.lesson.id}`;
+    const prefix = state.mode === "weak" ? "Tricky keys" : state.mode === "adaptive" ? "Today's adaptive practice" : `Lesson ${state.lesson.id}`;
     $("practice-sub").textContent = `${prefix} · Exercise ${state.exIndex + 1} of ${state.exercises.length}`;
     $("practice-title").textContent = ex.test ? `Unit test: ${ex.name}` : ex.name;
     $("stat-time-label").textContent = "Time";
@@ -409,6 +424,47 @@
     state.exResults[state.exIndex] = st;
     const isLast = state.exIndex >= state.exercises.length - 1;
     const ex = state.exercises[state.exIndex];
+
+    if (state.mode === "adaptive") {
+      const target = Math.round(12 * levelInfo().wpm);
+      const stars = KQ.starsFor(st.wpm, st.accuracy, target);
+      if (!isLast) {
+        showResults({
+          eyebrow: `Adaptive practice · ${state.exIndex + 1} of ${state.exercises.length}`,
+          title: st.accuracy >= 97 && (st.hesitationRate || 0) < 15 ? "Smooth!" : "Good practice",
+          stars, stats: st, message: encouragement(st, target),
+          next: { label: "Next step ▶", action: () => { state.exIndex++; startExercise(); } },
+          retry: { label: "↻ Repeat", action: startExercise },
+          back: { label: "Home", action: () => go("home") },
+        });
+        return;
+      }
+      const agg = aggregate(state.exResults);
+      const before = state.adaptivePlan.status.stage.index;
+      const status = KQ.adaptiveStageStatus(state.profile);
+      if (status.ready && before < KQ.ADAPTIVE_STAGES.length - 1) {
+        state.profile.adaptiveStage = before + 1;
+      }
+      store.addHistory(state.profile, {
+        type: "adaptive", label: "Adaptive practice: " + state.adaptivePlan.stage.title,
+        wpm: agg.wpm, acc: agg.accuracy, errors: agg.errors, seconds: agg.seconds,
+        latency: agg.avgLatencyMs, hesitation: agg.hesitationRate
+      });
+      store.save();
+      const progressed = (state.profile.adaptiveStage || 0) > before;
+      showResults({
+        eyebrow: "Today's adaptive practice complete",
+        title: progressed ? "Pattern mastered — next keys unlocked! 🎉" : "Practice stored ✓",
+        stars: KQ.starsFor(agg.wpm, agg.accuracy, target), stats: agg,
+        message: progressed
+          ? `Next time: ${KQ.adaptiveStageFor(state.profile).title}.`
+          : `TouchType will bring back words and key patterns that were hesitant, inaccurate or due for review.`,
+        next: { label: "Home ▶", action: () => go("home") },
+        retry: { label: "↻ Practice again", action: startAdaptivePractice },
+        back: { label: "Extra lessons", action: () => go("lessons") },
+      });
+      return;
+    }
 
     if (state.mode === "weak") {
       const target = Math.round(12 * levelInfo().wpm);
