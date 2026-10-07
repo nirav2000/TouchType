@@ -405,6 +405,22 @@
     const s = state.session;
     const st = s.stats();
     store.recordAdaptiveSession(state.profile, s);
+    const activeExercise = state.mode === "test" ? null : state.exercises[state.exIndex];
+    store.recordDrill(state.profile, {
+      mode: state.mode,
+      stage: state.mode === "adaptive" ? state.adaptivePlan?.stage?.id : null,
+      stageTitle: state.mode === "adaptive" ? state.adaptivePlan?.stage?.title : null,
+      exercise: activeExercise?.name || (state.mode === "test" ? "Speed test" : "Practice"),
+      exerciseIndex: state.exIndex,
+      targets: activeExercise?.targets || [],
+      wpm: st.wpm,
+      accuracy: st.accuracy,
+      errors: st.errors,
+      seconds: st.seconds,
+      latency: st.avgLatencyMs,
+      hesitation: st.hesitationRate,
+      timingSamples: st.timingSamples,
+    });
     state.keyboard.clearHighlight();
     KQ.highlightFinger($("hands-practice"), null);
 
@@ -452,16 +468,22 @@
       });
       store.save();
       const progressed = (state.profile.adaptiveStage || 0) > before;
+      const nextPlan = KQ.buildAdaptivePlan(state.profile);
+      const advice = store.continuationAdvice(state.profile);
+      const dueWords = nextPlan.targets.slice(0, 4).join(", ");
+      const improvement = adaptiveProgressMessage(state.profile, agg);
       showResults({
         eyebrow: "Today's adaptive practice complete",
         title: progressed ? "Pattern mastered — next keys unlocked! 🎉" : "Practice stored ✓",
         stars: KQ.starsFor(agg.wpm, agg.accuracy, target), stats: agg,
         message: progressed
-          ? `Next time: ${KQ.adaptiveStageFor(state.profile).title}.`
-          : `TouchType will bring back words and key patterns that were hesitant, inaccurate or due for review.`,
-        next: { label: "Home ▶", action: () => go("home") },
-        retry: { label: "↻ Practice again", action: startAdaptivePractice },
-        back: { label: "Extra lessons", action: () => go("lessons") },
+          ? `${improvement} Next stage: ${KQ.adaptiveStageFor(state.profile).title}.`
+          : `${improvement} Likely to appear again: ${dueWords || "the weakest current patterns"}.`,
+        next: { label: "View progress ▶", action: () => go("progress") },
+        retry: { label: advice.stop ? "Practice more anyway" : "Continue practice", action: startAdaptivePractice },
+        back: { label: "Home", action: () => go("home") },
+        note: advice.reason,
+        stopRecommended: advice.stop,
       });
       return;
     }
@@ -550,6 +572,17 @@
     };
   }
 
+  function adaptiveProgressMessage(profile, current) {
+    const prior = profile.history.filter((h) => h.type === "adaptive").slice(1, 2)[0];
+    if (!prior) return `Baseline saved: ${current.accuracy}% accuracy, ${current.hesitationRate || 0}% hesitation.`;
+    const acc = current.accuracy - (prior.acc || 0);
+    const hes = (prior.hesitation || 0) - (current.hesitationRate || 0);
+    const bits = [];
+    if (Math.abs(acc) >= 1) bits.push(`accuracy ${acc > 0 ? "+" : ""}${acc}%`);
+    if (Math.abs(hes) >= 2) bits.push(`hesitation ${hes > 0 ? "down " : "up "}${Math.abs(hes)} points`);
+    return bits.length ? `Since the previous block: ${bits.join(", ")}.` : "Performance is broadly stable; retention after a break is now more useful than more immediate repetition.";
+  }
+
   function encouragement(st, target) {
     if (st.accuracy < 85) return "Accuracy first, speed later. Try slowing down a little.";
     if (st.accuracy < 92) return "Almost there. A little more care will earn more stars.";
@@ -567,6 +600,12 @@
     $("results-errors").textContent = r.stats.errors;
     $("results-time").textContent = fmtTime(r.stats.seconds);
     $("results-message").textContent = r.message || "";
+    const note = $("results-note");
+    if (note) {
+      note.hidden = !r.note;
+      note.classList.toggle("stop-note", !!r.stopRecommended);
+      note.textContent = r.note || "";
+    }
     const nextBtn = $("btn-results-next"), retryBtn = $("btn-results-retry"), backBtn = $("btn-results-back");
     nextBtn.textContent = r.next.label; nextBtn.onclick = r.next.action;
     retryBtn.style.display = r.retry ? "" : "none";
@@ -697,10 +736,29 @@
     const bestWpm = p.history.reduce((a, h) => Math.max(a, h.wpm || 0), 0);
     const accs = p.history.filter((h) => h.acc != null);
     const avgAcc = accs.length ? Math.round(accs.reduce((a, h) => a + h.acc, 0) / accs.length) : 0;
+    const snap = store.learningSnapshot(p);
+    const status = KQ.adaptiveStageStatus(p);
     $("progress-summary").innerHTML = [
-      [done + "/" + KQ.LESSONS.length, "Lessons"], [stars, "Stars"], [bestWpm, "Best WPM"], [avgAcc + "%", "Avg accuracy"],
-      [bests().rain, "Letter Rain"], [bests().race + " WPM", "Rocket Race"], [bests().bubbles, "Bubble Pop"],
+      [snap.adaptiveSessions, "Adaptive sessions"], [snap.totalDrills, "Drills stored"], [snap.masteredWords, "Fluent words"],
+      [snap.dueNow, "Due now"], [snap.totalMinutes + " min", "Practice stored"], [bestWpm, "Best WPM"], [avgAcc + "%", "Avg accuracy"],
     ].map(([v, l]) => `<div class="stat"><span class="stat-val">${v}</span><span class="stat-label">${l}</span></div>`).join("");
+
+    $("progress-stage-title").textContent = status.stage.title;
+    $("progress-stage-detail").innerHTML =
+      `<div class="meter-row"><span>Focus words fluent</span><strong>${status.masteredWords}/${status.wordGoal}</strong></div>` +
+      status.keyDetails.map((k) => `<div class="meter-row"><span>${k.ch.toUpperCase()} key</span><strong>${k.attempts ? Math.round(k.accuracy)+"% · "+(Number.isFinite(k.latency)?Math.round(k.latency)+" ms":"learning") : "not measured"}</strong></div>`).join("") +
+      `<p class="muted small">${status.ready ? "Mastery threshold reached; the next stage can unlock." : "Still building automaticity. Early restricted-key drills are judged mainly by accuracy and hesitation, not headline WPM."}</p>`;
+
+    const due = snap.dueWords;
+    const upcoming = snap.upcoming;
+    $("progress-review-forecast").innerHTML = due.length
+      ? `<p><strong>Due now:</strong> ${due.map(x=>KQ.escapeHtml(x.word)).join(", ")}</p>`
+      : `<p><strong>Nothing overdue.</strong></p>`;
+    if (upcoming.length) $("progress-review-forecast").innerHTML += `<p><strong>Likely next:</strong> ${upcoming.slice(0,8).map(x=>`${KQ.escapeHtml(x.word)} <span class="muted">(${relativeDue(x.due)})</span>`).join(" · ")}</p>`;
+
+    const drills = (p.drillRecords || []).slice(0, 50);
+    $("progress-drills").innerHTML = `<tr><th>When</th><th>Drill</th><th>Targets</th><th>Accuracy</th><th>Hesitation</th><th>WPM</th></tr>` +
+      (drills.length ? drills.map((d) => `<tr><td>${new Date(d.date).toLocaleString([], {dateStyle:"medium",timeStyle:"short"})}</td><td>${KQ.escapeHtml(d.exercise)}</td><td>${(d.targets||[]).map(KQ.escapeHtml).join(", ") || "–"}</td><td>${d.accuracy}%</td><td>${d.timingSamples ? d.hesitation+"%" : "–"}</td><td>${d.wpm}</td></tr>`).join("") : `<tr><td colspan="6" class="muted">No drills stored yet.</td></tr>`);
 
     if (!state.heatKeyboard) state.heatKeyboard = new KQ.Keyboard($("kb-heat"));
     state.heatKeyboard.heatmap(p.keyStats);
@@ -715,6 +773,15 @@
     $("progress-history").innerHTML = `<tr><th>When</th><th>Activity</th><th>WPM</th><th>Accuracy</th><th>Score</th></tr>` +
       (hist.length ? hist.map((h) => `<tr><td>${new Date(h.date).toLocaleString([], { dateStyle: "medium", timeStyle: "short" })}</td><td>${KQ.escapeHtml(h.label)}</td><td>${h.wpm ?? "–"}</td><td>${h.acc != null ? h.acc + "%" : "–"}</td><td>${h.score ?? "–"}</td></tr>`).join("")
         : `<tr><td colspan="5" class="muted">Nothing yet. Go type something!</td></tr>`);
+  }
+
+  function relativeDue(ts) {
+    const ms = ts - Date.now();
+    if (ms <= 0) return "now";
+    const hours = Math.round(ms / 3600000);
+    if (hours < 24) return hours <= 1 ? "within an hour" : `in ${hours}h`;
+    const days = Math.round(hours / 24);
+    return `in ${days} day${days === 1 ? "" : "s"}`;
   }
 
   // ---------- settings ----------
