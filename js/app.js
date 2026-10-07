@@ -37,7 +37,7 @@
   document.querySelectorAll("[data-go]").forEach((b) => b.addEventListener("click", () => go(b.dataset.go)));
 
   function go(name) {
-    const builders = { home: renderHome, lessons: renderLessons, progress: renderProgress, settings: renderSettings, games: renderGames, profiles: renderProfiles };
+    const builders = { home: renderHome, lessons: renderLessons, progress: renderProgress, analytics: renderAnalytics, settings: renderSettings, games: renderGames, profiles: renderProfiles };
     if (builders[name]) builders[name]();
     show(name);
   }
@@ -165,6 +165,7 @@
   $("nav-lessons").addEventListener("click", () => go("lessons"));
   $("nav-games").addEventListener("click", () => go("games"));
   $("nav-progress").addEventListener("click", () => go("progress"));
+  $("nav-analytics").addEventListener("click", () => go("analytics"));
   $("nav-settings").addEventListener("click", () => go("settings"));
   $("nav-test").addEventListener("click", startSpeedTest);
 
@@ -744,6 +745,12 @@
   }
 
   // ---------- progress ----------
+  function renderAnalytics() {
+    if (!state.profile || !KQ.analytics) return;
+    KQ.analytics.render(state.profile, $("analytics-range").value || "30");
+  }
+  $("analytics-range").addEventListener("change", renderAnalytics);
+
   function renderProgress() {
     const p = state.profile;
     const done = KQ.LESSONS.filter((l) => store.mastered(p, l)).length;
