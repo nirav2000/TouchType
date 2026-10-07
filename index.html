@@ -41,13 +41,24 @@
     <!-- Home -->
     <section id="screen-home" class="screen">
       <h1 class="big-title" id="home-greeting">Hi!</h1>
-      <div class="card continue-card" id="home-continue">
+      <div class="card continue-card adaptive-card" id="home-continue">
         <div>
-          <div class="eyebrow">Up next</div>
+          <div class="eyebrow">Today's adaptive practice</div>
           <div class="continue-title" id="continue-title"></div>
           <div class="muted" id="continue-sub"></div>
+          <div class="adaptive-meta" id="adaptive-meta"></div>
         </div>
-        <button id="btn-continue" class="btn primary big">Start lesson ▶</button>
+        <button id="btn-continue" class="btn primary big">Start today's practice ▶</button>
+      </div>
+      <div class="card method-card">
+        <div class="eyebrow">How TouchType learns with you</div>
+        <div class="method-flow">
+          <span><b>1</b> New word ×5</span><span>→</span>
+          <span><b>2</b> Real sentence</span><span>→</span>
+          <span><b>3</b> Mixed recall</span><span>→</span>
+          <span><b>4</b> Review when due</span>
+        </div>
+        <p class="muted small">Correct but hesitant is not mastery. TouchType tracks accuracy, pauses and word fluency, then brings weak or due patterns back more often.</p>
       </div>
       <div class="card weak-card" id="home-weak" hidden>
         <div>
@@ -58,7 +69,7 @@
         <button id="btn-weak" class="btn primary">Practice ▶</button>
       </div>
       <div class="nav-grid">
-        <button class="nav-card" id="nav-lessons"><span class="nav-icon">📚</span><span>Lessons</span></button>
+        <button class="nav-card" id="nav-lessons"><span class="nav-icon">📚</span><span>Extra lessons</span></button>
         <button class="nav-card" id="nav-games"><span class="nav-icon">🎮</span><span>Games</span></button>
         <button class="nav-card" id="nav-test"><span class="nav-icon">⏱️</span><span>Speed Test</span></button>
         <button class="nav-card" id="nav-progress"><span class="nav-icon">⭐</span><span>My Progress</span></button>
