@@ -19,6 +19,8 @@ function ensureAdaptive(profile) {
   profile.keyStats = profile.keyStats || {};
   profile.transitionStats = profile.transitionStats || {};
   profile.wordSkills = profile.wordSkills || {};
+  profile.drillRecords = profile.drillRecords || [];
+  profile.adaptiveStage = Number(profile.adaptiveStage || 0);
   return profile;
 }
 
@@ -67,6 +69,8 @@ KQ.store = {
       keyStats: {},
       transitionStats: {},
       wordSkills: {},
+      drillRecords: [],
+      adaptiveStage: 0,
       history: [],
       bests: { rain: 0, race: 0, bubbles: 0 },
     };
@@ -169,6 +173,83 @@ KQ.store = {
       .sort((a, b) => (a.stage - b.stage) || (b.errorRate - a.errorRate) || (a.due - b.due))
       .slice(0, n)
       .map((x) => x.word);
+  },
+
+
+  recordDrill(profile, record) {
+    ensureAdaptive(profile);
+    const row = Object.assign({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      date: new Date().toISOString(),
+    }, record || {});
+    profile.drillRecords.unshift(row);
+    if (profile.drillRecords.length > 1000) profile.drillRecords.length = 1000;
+    this.save();
+    return row;
+  },
+
+  learningSnapshot(profile) {
+    ensureAdaptive(profile);
+    const now = Date.now();
+    const words = Object.entries(profile.wordSkills);
+    const masteredWords = words.filter(([,s]) => (s.stage || 0) >= 2).length;
+    const learningWords = words.filter(([,s]) => (s.stage || 0) < 2).length;
+    const due = words
+      .filter(([,s]) => (s.due || 0) <= now)
+      .sort((a,b) => (a[1].due || 0) - (b[1].due || 0));
+    const upcoming = words
+      .filter(([,s]) => (s.due || 0) > now)
+      .sort((a,b) => (a[1].due || 0) - (b[1].due || 0));
+    const adaptive = profile.history.filter((h) => h.type === "adaptive");
+    const drills = profile.drillRecords || [];
+    const totalSeconds = drills.reduce((a,d) => a + (d.seconds || 0), 0);
+    return {
+      masteredWords,
+      learningWords,
+      dueNow: due.length,
+      nextDueAt: upcoming[0]?.[1]?.due || null,
+      totalDrills: drills.length,
+      adaptiveSessions: adaptive.length,
+      totalMinutes: Math.round(totalSeconds / 60),
+      upcoming: upcoming.slice(0, 12).map(([word,s]) => ({word, due:s.due, stage:s.stage || 0})),
+      dueWords: due.slice(0, 12).map(([word,s]) => ({word, due:s.due, stage:s.stage || 0})),
+    };
+  },
+
+  continuationAdvice(profile) {
+    ensureAdaptive(profile);
+    const now = Date.now();
+    const recent = profile.history
+      .filter((h) => h.type === "adaptive" && now - new Date(h.date).getTime() <= 60 * 60 * 1000)
+      .slice(0, 4);
+    if (!recent.length) return { stop:false, reason:"", label:"Continue practice" };
+    const minutes = recent.reduce((a,h) => a + (h.seconds || 0), 0) / 60;
+    if (recent.length < 2) {
+      return {
+        stop:false,
+        reason:"A second short block can still be useful if concentration feels good.",
+        label:"Continue practice",
+      };
+    }
+    const cur = recent[0], prev = recent[1];
+    const accGain = (cur.acc ?? 0) - (prev.acc ?? 0);
+    const latencyGain = (prev.latency ?? 0) - (cur.latency ?? 0);
+    const hesitationGain = (prev.hesitation ?? 0) - (cur.hesitation ?? 0);
+    const strong = (cur.acc ?? 0) >= 97 && (cur.hesitation ?? 100) <= 10;
+    const flat = accGain <= 1 && latencyGain <= 50 && hesitationGain <= 2;
+    const stop = minutes >= 12 || (recent.length >= 2 && flat && strong) || recent.length >= 3;
+    return stop ? {
+      stop:true,
+      reason:"More repetitions right now are showing little extra benefit. A break will make the next check more informative.",
+      label:"Practice more anyway",
+      breakMinutes:30,
+      evidence:{minutes:Math.round(minutes),accGain,latencyGain,hesitationGain},
+    } : {
+      stop:false,
+      reason:"There is still measurable room to improve in this sitting.",
+      label:"Continue practice",
+      evidence:{minutes:Math.round(minutes),accGain,latencyGain,hesitationGain},
+    };
   },
 
   addHistory(profile, entry) {
