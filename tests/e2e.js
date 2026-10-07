@@ -128,7 +128,14 @@ function check(name, cond) {
     await page.click("#set-focus");
     check("focus mode can be enabled", await page.evaluate(()=>document.body.classList.contains("focus-mode")));
     await page.click("#screen-settings [data-go=home]");
-    await page.click("#screen-progress [data-go=home]");
+    check("focus home explains simplified mode", await page.$eval("#focus-home-note",e=>getComputedStyle(e).display!=="none"));
+    check("focus home hides extra lessons", await page.$eval("#nav-lessons",e=>getComputedStyle(e).display==="none"));
+    check("focus home keeps progress", await page.$eval("#nav-progress",e=>getComputedStyle(e).display!=="none"));
+    check("focus home keeps settings", await page.$eval("#nav-settings",e=>getComputedStyle(e).display!=="none"));
+    await page.click("#btn-continue"); await wait(100);
+    check("focus practice keeps Home navigation", await page.$eval("#btn-home",e=>getComputedStyle(e).display!=="none"));
+    check("focus practice keeps quit/back control", await page.$eval("#btn-quit",e=>getComputedStyle(e).display!=="none"));
+    await page.click("#btn-home");
 
     console.log("Lessons and mastery");
     await page.click("#nav-lessons"); await wait(150);
