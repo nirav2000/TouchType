@@ -101,6 +101,18 @@ function check(name, cond) {
     check("home screen shown", await page.$eval("#screen-home", (e) => e.classList.contains("active")));
     check("adaptive practice is the primary home action", /adaptive practice/i.test(await page.$eval("#home-continue",(e)=>e.innerText)));
     check("five-repeat method is visible", /New word ×5/.test(await page.$eval(".method-card",(e)=>e.innerText)));
+    const progressModel = await page.evaluate(() => {
+      const p = KQ.store.current();
+      KQ.store.recordDrill(p,{mode:"adaptive",stage:"home-gh",exercise:"Test drill",targets:["glass"],wpm:20,accuracy:98,errors:0,seconds:30,latency:400,hesitation:5,timingSamples:20});
+      const snap=KQ.store.learningSnapshot(p);
+      return {drills:snap.totalDrills, hasAdvice:typeof KQ.store.continuationAdvice(p).stop==="boolean"};
+    });
+    check("drill-level history is persisted", progressModel.drills >= 1);
+    check("continuation advice is available", progressModel.hasAdvice);
+    await page.click("#nav-progress");
+    check("progress shows adaptive drills", /Adaptive drills completed/.test(await page.$eval("#screen-progress",(e)=>e.innerText)));
+    check("progress shows review forecast", /Review forecast/.test(await page.$eval("#screen-progress",(e)=>e.innerText)));
+    await page.click("#screen-progress [data-go=home]");
 
     console.log("Lessons and mastery");
     await page.click("#nav-lessons"); await wait(150);
