@@ -74,6 +74,7 @@
         <button class="nav-card" id="nav-games"><span class="nav-icon">🎮</span><span>Games</span></button>
         <button class="nav-card" id="nav-test"><span class="nav-icon">⏱️</span><span>Speed Test</span></button>
         <button class="nav-card" id="nav-progress"><span class="nav-icon">⭐</span><span>My Progress</span></button>
+        <button class="nav-card" id="nav-analytics"><span class="nav-icon">📈</span><span>Analytics</span></button>
         <button class="nav-card" id="nav-settings"><span class="nav-icon">⚙️</span><span>Settings</span></button>
       </div>
     </section>
@@ -283,6 +284,21 @@
       </div>
     </section>
 
+    <!-- Analytics -->
+    <section id="screen-analytics" class="screen">
+      <div class="screen-head analytics-head">
+        <div><div class="eyebrow">Parent / detailed view</div><h1>Typing Analytics</h1><p class="muted" id="analytics-caption"></p></div>
+        <div class="row wrap"><select id="analytics-range"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="all">All time</option></select><button class="btn ghost" data-go="home">← Home</button></div>
+      </div>
+      <div class="results-grid card analytics-summary" id="analytics-summary"></div>
+      <div class="analytics-grid">
+        <div class="card chart-card"><div class="eyebrow">Fluency</div><h2>Typing speed over time</h2><p class="muted small">Useful once drills contain meaningful words and sentences; early restricted-key WPM is retained but should not be treated as the main mastery signal.</p><div id="chart-speed" class="chart-host"></div></div>
+        <div class="card chart-card"><div class="eyebrow">Automaticity</div><h2>Accuracy vs hesitation</h2><p class="muted small">The ideal direction is high accuracy with falling hesitation. This is more informative than WPM alone for early motor learning.</p><div id="chart-quality" class="chart-host"></div></div>
+      </div>
+      <div class="card chart-card"><div class="eyebrow">Keyboard diagnostic</div><h2>Accuracy by key</h2><p class="muted small">Hover/tap bars for values. The table below separates accuracy from latency and hesitation so a correct-but-slow key remains visible.</p><div id="chart-keys" class="chart-host wide"></div><div class="table-wrap"><table id="analytics-keys-table"></table></div></div>
+      <div class="card"><div class="eyebrow">Adaptive SRS</div><h2>Word mastery & review state</h2><p class="muted">Retention and stability are the scheduler's current estimates; “Due now” means TouchType is likely to surface that motor pattern again.</p><div class="table-wrap"><table id="analytics-words-table"></table></div></div>
+    </section>
+
     <!-- Settings -->
     <section id="screen-settings" class="screen">
       <div class="screen-head"><h1>Settings</h1><button class="btn ghost" data-go="home">← Home</button></div>
@@ -342,6 +358,7 @@
 <script src="js/game.js"></script>
 <script src="js/race.js"></script>
 <script src="js/bubbles.js"></script>
+<script src="js/analytics.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>
