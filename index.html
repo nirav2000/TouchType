@@ -14,6 +14,7 @@
   <header class="topbar">
     <button class="brand" id="btn-home" title="Home">⌨️ <span>TouchType</span></button>
     <div class="topbar-right">
+      <button id="btn-focus" class="icon-btn" title="Focus mode" aria-pressed="false">◎</button>
       <button id="btn-sound" class="icon-btn" title="Sound on/off">🔊</button>
       <button id="btn-profile" class="profile-chip" title="Switch typist"><span id="chip-avatar"></span><span id="chip-name"></span></button>
     </div>
@@ -292,7 +293,15 @@
         <label class="toggle"><input type="checkbox" id="set-stop"><span>Wait for the right key after a mistake <small>(off: keep going, fix with Backspace)</small></span></label>
         <label class="toggle"><input type="checkbox" id="set-keyboard"><span>Show on-screen keyboard</span></label>
         <label class="toggle"><input type="checkbox" id="set-hands"><span>Show hands</span></label>
+        <label class="toggle"><input type="checkbox" id="set-focus"><span>Focus mode <small>Hide navigation, live speed and optional visual aids while typing. Accuracy feedback remains.</small></span></label>
+        <label class="toggle"><span>Spaced review system <small>Adaptive uses delayed retention, accuracy and fluency to choose the next interval. Classic uses the original fixed ladder.</small></span>
+          <select id="set-srs"><option value="adaptive">Adaptive motor SRS</option><option value="ladder">Classic 1 · 3 · 7 · 14 · 30 days</option></select></label>
         <label class="toggle"><input type="checkbox" id="set-unlock"><span>Unlock all lessons <small>(for grown-ups; normally a lesson needs 2 stars to unlock the next)</small></span></label>
+      </div>
+      <div class="card">
+        <h2>About</h2>
+        <p>TouchType <strong id="settings-version">v…</strong></p>
+        <p class="muted" id="settings-version-name"></p>
       </div>
       <div class="card">
         <h2>Backup</h2>
@@ -313,7 +322,7 @@
     </section>
 
   </main>
-  <footer class="footer">TouchType is free and open source. Made with ❤️ for kids learning to type.</footer>
+  <footer class="footer">TouchType <span id="app-version">v…</span> · free and open source · Made with ❤️ for kids learning to type.</footer>
 </div>
 
 <script>
