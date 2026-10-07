@@ -104,11 +104,26 @@
   $("btn-create").addEventListener("click", createProfile);
   $("new-name").addEventListener("keydown", (e) => { if (e.key === "Enter") createProfile(); });
 
+  function applyFocusMode() {
+    const on = !!settings().focusMode;
+    document.body.classList.toggle("focus-mode", on);
+    $("btn-focus").setAttribute("aria-pressed", String(on));
+    $("btn-focus").classList.toggle("active", on);
+    $("btn-focus").title = on ? "Leave focus mode" : "Focus mode";
+  }
+
   function updateChip() {
     $("chip-avatar").textContent = state.profile.avatar;
     $("chip-name").textContent = state.profile.name;
     $("btn-sound").textContent = settings().sound ? "🔊" : "🔇";
+    applyFocusMode();
   }
+  $("btn-focus").addEventListener("click", () => {
+    if (!state.profile) return;
+    settings().focusMode = !settings().focusMode;
+    store.save();
+    applyFocusMode();
+  });
   $("btn-profile").addEventListener("click", () => go("profiles"));
   $("btn-home").addEventListener("click", () => (state.profile ? go("home") : go("profiles")));
   $("btn-sound").addEventListener("click", () => {
@@ -785,22 +800,29 @@
   }
 
   // ---------- settings ----------
-  const SETTING_IDS = { sound: "set-sound", stopOnError: "set-stop", showKeyboard: "set-keyboard", showHands: "set-hands", unlockAll: "set-unlock" };
+  const SETTING_IDS = { sound: "set-sound", stopOnError: "set-stop", showKeyboard: "set-keyboard", showHands: "set-hands", focusMode: "set-focus", unlockAll: "set-unlock" };
   function renderSettings() {
     const s = settings();
     for (const [k, id] of Object.entries(SETTING_IDS)) $(id).checked = !!s[k];
     const sel = $("set-level");
     sel.innerHTML = Object.entries(KQ.LEVELS).map(([k, v]) => `<option value="${k}">${KQ.escapeHtml(v.label)} (${KQ.escapeHtml(v.ages)})</option>`).join("");
     sel.value = level();
+    $("set-srs").value = settings().srsMode || "adaptive";
+    applyFocusMode();
   }
   for (const [k, id] of Object.entries(SETTING_IDS)) {
     $(id).addEventListener("change", (e) => {
       settings()[k] = e.target.checked;
       if (k === "sound") { KQ.audio.enabled = e.target.checked; updateChip(); }
+      if (k === "focusMode") applyFocusMode();
       store.save();
     });
   }
   $("set-level").addEventListener("change", (e) => { settings().level = e.target.value; store.save(); });
+  $("set-srs").addEventListener("change", (e) => {
+    settings().srsMode = e.target.value === "ladder" ? "ladder" : "adaptive";
+    store.save();
+  });
   $("btn-export").addEventListener("click", () => {
     const blob = new Blob([store.exportJson()], { type: "application/json" });
     const a = document.createElement("a");
@@ -851,8 +873,24 @@
   document.addEventListener("pointerdown", () => KQ.audio.ensure(), { once: true });
   document.addEventListener("keydown", () => KQ.audio.ensure(), { once: true });
 
+  async function loadVersion() {
+    try {
+      const res = await fetch("version.json", {cache:"no-store"});
+      if (!res.ok) throw new Error("version unavailable");
+      const v = await res.json();
+      const label = "v" + v.version;
+      $("app-version").textContent = label;
+      $("settings-version").textContent = label;
+      $("settings-version-name").textContent = v.name || "";
+    } catch (_) {
+      $("app-version").textContent = "";
+      $("settings-version").textContent = "version unavailable";
+    }
+  }
+
   // ---------- boot ----------
   store.load();
+  loadVersion();
   state.profile = store.current();
   if (state.profile) {
     KQ.audio.enabled = settings().sound;
