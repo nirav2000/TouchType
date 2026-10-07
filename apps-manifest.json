@@ -1,0 +1,17 @@
+{
+  "appId": "touchtype",
+  "platformVersion": "1.5.0",
+  "capabilities": {
+    "monitor": true
+  },
+  "ui": {"mode": "headless"},
+  "versionLab": {
+    "enabled": true,
+    "managed": true,
+    "developerOnly": true
+  },
+  "meta": {
+    "name": "TouchType",
+    "repository": "nirav2000/TouchType"
+  }
+}
