@@ -82,13 +82,25 @@ function check(name, cond) {
     });
     check("G and H come before E and I", adaptive.title === "G and H");
     check("adaptive lesson contains acquisition drill", adaptive.hasAcquisition);
-    check("acquisition words repeat five times", Object.values(adaptive.counts).every((n) => n === 5));
+    check("acquisition words repeat exactly five times", Object.values(adaptive.counts).every((n) => n === 5));
+    const daily = await page.evaluate(() => {
+      const p = { wordSkills: {}, keyStats: {}, transitionStats: {}, adaptiveStage: 0 };
+      const plan = KQ.buildAdaptivePlan(p);
+      const counts = plan.exercises[0].text.split(" ").reduce((m,w)=>((m[w]=(m[w]||0)+1),m),{});
+      return {stage:plan.stage.id, reps:plan.repetitions, counts, hasSentence:plan.exercises.some(x=>x.transfer), hasRecall:plan.exercises.some(x=>x.recall)};
+    });
+    check("adaptive daily practice starts at home row plus G/H", daily.stage === "home-gh");
+    check("new adaptive words repeat exactly five times", Object.values(daily.counts).every((n) => n === 5));
+    check("adaptive practice transfers into sentences", daily.hasSentence);
+    check("adaptive practice includes mixed recall", daily.hasRecall);
 
     console.log("Profiles and home");
     await page.click("#level-picker button:nth-child(1)");
     await page.fill("#new-name", "Ada"); await page.click("#btn-create"); await wait(200);
     check("profile created with little-kid level", (await profile()).settings.level === "little");
     check("home screen shown", await page.$eval("#screen-home", (e) => e.classList.contains("active")));
+    check("adaptive practice is the primary home action", /adaptive practice/i.test(await page.$eval("#home-continue",(e)=>e.innerText)));
+    check("five-repeat method is visible", /New word ×5/.test(await page.$eval(".method-card",(e)=>e.innerText)));
 
     console.log("Lessons and mastery");
     await page.click("#nav-lessons"); await wait(150);
