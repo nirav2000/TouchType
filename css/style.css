@@ -331,24 +331,43 @@ select { font: inherit; font-weight: 700; padding: 8px 12px; border-radius: 10px
 .results-note.stop-note{border:1px solid #d6a647}
 @media(max-width:720px){.progress-two{grid-template-columns:1fr}}
 
-/* Focus mode: preserve typing feedback, remove optional distractions. */
+/* Focus mode: simplify choices without trapping the learner. */
 #btn-focus.active{background:#dbeafe;box-shadow:0 0 0 2px var(--primary)}
+.focus-home-note{display:none}
+body.focus-mode #screen-home.active .focus-home-note{
+  display:flex;flex-direction:column;gap:3px;margin:0 0 14px;padding:14px 16px;border-radius:16px;
+  background:var(--surface2,#f3f6f8);border:1px solid var(--border,#dde4e8)
+}
+body.focus-mode #screen-home.active .focus-home-note>span:first-child{font-size:.78rem;font-weight:850;color:var(--primary);text-transform:uppercase;letter-spacing:.04em}
+body.focus-mode #screen-home.active .method-card,
+body.focus-mode #screen-home.active .weak-card,
+body.focus-mode #screen-home.active #nav-lessons,
+body.focus-mode #screen-home.active #nav-games,
+body.focus-mode #screen-home.active #nav-test,
+body.focus-mode #screen-home.active #nav-analytics{display:none}
+body.focus-mode #screen-home.active .nav-grid{grid-template-columns:repeat(2,minmax(0,1fr));max-width:560px;margin-inline:auto}
+body.focus-mode #screen-home.active #home-continue{margin-top:0}
+body.focus-mode #screen-home.active .big-title{margin-bottom:12px}
+
+/* During an exercise, reduce visual noise but always retain navigation. */
 body.focus-mode #screen-practice .stats .stat:first-child,
 body.focus-mode #screen-practice #stat-time,
 body.focus-mode #screen-practice #stat-time-label,
 body.focus-mode #screen-practice .kb-area,
 body.focus-mode #screen-practice .hint-line,
-body.focus-mode #screen-practice .practice-actions,
 body.focus-mode #screen-practice .progress-bar{display:none}
-body.focus-mode:has(#screen-practice.active) .topbar .brand,
+body.focus-mode #screen-practice .practice-actions{display:flex}
 body.focus-mode:has(#screen-practice.active) #btn-sound,
 body.focus-mode:has(#screen-practice.active) #btn-profile,
 body.focus-mode:has(#screen-practice.active) .footer{display:none}
-body.focus-mode:has(#screen-practice.active) #app{max-width:900px;padding-top:28px}
-body.focus-mode:has(#screen-practice.active) .topbar{justify-content:flex-end;padding:0 0 12px}
-body.focus-mode:has(#screen-practice.active) #btn-focus{display:block}
+body.focus-mode:has(#screen-practice.active) .topbar .brand{display:flex}
+body.focus-mode:has(#screen-practice.active) #app{max-width:900px;padding-top:18px}
+body.focus-mode:has(#screen-practice.active) .topbar{justify-content:space-between;padding:0 0 12px}
 body.focus-mode #screen-practice .text-display{font-size:2.15rem;line-height:1.8;padding:34px 38px;min-height:150px}
-@media(max-width:640px){body.focus-mode #screen-practice .text-display{font-size:1.55rem;padding:24px}}
+@media(max-width:640px){
+  body.focus-mode #screen-practice .text-display{font-size:1.55rem;padding:24px}
+  body.focus-mode #screen-home.active .nav-grid{grid-template-columns:1fr 1fr}
+}
 
 /* Detailed analytics dashboard */
 .analytics-head{align-items:flex-start}
