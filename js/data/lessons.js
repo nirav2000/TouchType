@@ -59,8 +59,8 @@ const RAW_LESSONS = [
   { id: 3,  unit: 0, title: "S and L",               keys: "sl",  kind: "keys",    tip: "Ring fingers on S and L. Try not to look down at your hands!" },
   { id: 4,  unit: 0, title: "A and ;",               keys: "a;",  kind: "keys",    tip: "Pinkies on A and semicolon. Pinkies are small but mighty." },
   { id: 5,  unit: 0, title: "Home Row Test",         keys: "",    kind: "review",  tip: "You know the whole home row! Warm up, then pass the test to unlock the top row." },
-  { id: 6,  unit: 1, title: "E and I",               keys: "ei",  kind: "keys",    tip: "Middle fingers reach up for E and I, then bounce straight back home. Real words start now!" },
-  { id: 7,  unit: 1, title: "G and H",               keys: "gh",  kind: "keys",    tip: "Stretch your index fingers inward to reach G and H, then bounce back home." },
+  { id: 6,  unit: 1, title: "G and H",               keys: "gh",  kind: "keys",    tip: "Stretch your index fingers inward to reach G and H, then come straight back to F and J. We will make these reaches automatic before moving up a row." },
+  { id: 7,  unit: 1, title: "E and I",               keys: "ei",  kind: "keys",    tip: "Middle fingers reach up for E and I, then bounce straight back home. These letters unlock many more real words and sentences." },
   { id: 8,  unit: 1, title: "R and U",               keys: "ru",  kind: "keys",    tip: "Index fingers reach up for R and U." },
   { id: 9,  unit: 1, title: "T and Y",               keys: "ty",  kind: "keys",    tip: "Index fingers stretch up and inward for T and Y." },
   { id: 10, unit: 1, title: "W and O",               keys: "wo",  kind: "keys",    tip: "Ring fingers reach up for W and O." },
@@ -247,6 +247,35 @@ function decorate(words, punct) {
   }
   return out;
 }
+function adaptiveWordPool(words, must, profile, allowed) {
+  const letters = must.filter((ch) => /[a-z]/.test(ch));
+  const due = profile && KQ.store ? KQ.store.dueWords(profile, allowed, 10) : [];
+  const newWords = letters.length ? words.filter((w) => letters.some((ch) => w.includes(ch))) : words;
+  const known = profile && profile.wordSkills ? profile.wordSkills : {};
+  const unseen = newWords.filter((w) => !known[w]);
+  const weak = newWords.filter((w) => {
+    const s = known[w];
+    return s && ((s.attempts && s.errors / s.attempts > 0.08) || (s.stage || 0) < 2);
+  });
+  return [...new Set(due.concat(weak, unseen, newWords))];
+}
+
+function exAcquire(words, must, allowed, len, profile) {
+  const pool = adaptiveWordPool(words, must, profile, allowed);
+  if (!pool.length) return exWords(words, must, allowed, len, "Word drill");
+  const targetCount = Math.max(2, Math.min(5, Math.floor(len / 28)));
+  const targets = pool.slice(0, targetCount);
+  const repeated = [];
+  for (const word of targets) for (let i = 0; i < 5; i++) repeated.push(word);
+  return { name: "Make these automatic", text: joinToLength(repeated, Math.max(len, repeated.join(" ").length)), targets, acquisition: true };
+}
+
+function exAdaptiveSentences(sentences, words, allowed, must, len, profile) {
+  const pool = adaptiveWordPool(words, must, profile, allowed).slice(0, 8);
+  const focused = pool.length ? sentences.filter((s) => pool.some((w) => s.includes(w))) : [];
+  return exSentences(focused.length ? focused : sentences, words, allowed, must, len, "Use them in sentences");
+}
+
 function exWords(words, must, allowed, len, name) {
   const letters = must.filter((c) => /[a-z]/.test(c));
   const punct = must.filter((c) => !/[a-z]/.test(c));
@@ -277,21 +306,20 @@ function buildIntro(lesson, len) {
   ];
 }
 
-function buildKeys(lesson, len) {
+function buildKeys(lesson, len, profile) {
   const [a, b] = lesson.newKeys;
   const must = [a, b];
   const words = wordsFor(lesson.allowed);
   const sentences = sentencesFor(lesson.allowed);
   const early = lesson.unit === 0;
+  const realWords = words.filter((w) => w.length >= 2);
   const list = [
-    exNew(a, b, len),
-    exRhythm(lesson.allowed, must, len),
-    exBigrams(lesson.allowed, must, words, len),
-    exWords(words, must, lesson.allowed, len),
-    exLonger(words, lesson.allowed, must, len),
-    exSentences(sentences, words, lesson.allowed, must, Math.round(len * 1.2)),
+    exNew(a, b, Math.round(len * 0.55)),
+    exRhythm(lesson.allowed, must, Math.round(len * 0.65)),
+    exAcquire(realWords, must, lesson.allowed, Math.round(len * 1.15), profile),
+    exAdaptiveSentences(sentences, realWords, lesson.allowed, must, Math.round(len * 1.25), profile),
+    exWords(realWords, must, lesson.allowed, len, "Mixed words"),
   ];
-  // Early lessons have no real words yet; keep them shorter so kids aren't drilling nonsense forever.
   return early ? list.slice(0, 4) : list;
 }
 
@@ -356,11 +384,11 @@ function buildStory() {
   return shuffle(KQ.PARAGRAPHS).slice(0, 4).map((p, i) => ({ name: `Story ${i + 1}`, text: p }));
 }
 
-KQ.buildExercises = function (lesson, level) {
+KQ.buildExercises = function (lesson, level, profile) {
   const len = Math.round(lesson.baseLen * KQ.levelInfo(level).length);
   switch (lesson.kind) {
     case "intro": return buildIntro(lesson, len);
-    case "keys": return buildKeys(lesson, len);
+    case "keys": return buildKeys(lesson, len, profile);
     case "review": return buildReview(lesson, len);
     case "shift": return buildShift(lesson, len);
     case "numbers": return buildNumbers(lesson, len);
