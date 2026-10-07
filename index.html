@@ -249,6 +249,22 @@
     <section id="screen-progress" class="screen">
       <div class="screen-head"><h1>My Progress</h1><button class="btn ghost" data-go="home">← Home</button></div>
       <div class="results-grid card" id="progress-summary"></div>
+      <div class="progress-two">
+        <div class="card">
+          <div class="eyebrow">Current learning stage</div>
+          <h2 id="progress-stage-title"></h2>
+          <div id="progress-stage-detail" class="progress-detail"></div>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Coming back</div>
+          <h2>Review forecast</h2>
+          <div id="progress-review-forecast" class="progress-detail"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row between wrap"><div><h2>Adaptive drills completed</h2><p class="muted">Every drill is kept so you can see whether accuracy, hesitation and fluency are actually improving.</p></div></div>
+        <div class="table-wrap"><table id="progress-drills"></table></div>
+      </div>
       <div class="card">
         <h2>Key accuracy</h2>
         <p class="muted">Green keys are your friends. Red keys need some practice.</p>
@@ -261,6 +277,7 @@
       </div>
       <div class="card">
         <h2>Recent activity</h2>
+        <p class="muted">A longer-term record of lessons, tests, adaptive practice and games.</p>
         <div class="table-wrap"><table id="progress-history"></table></div>
       </div>
     </section>
