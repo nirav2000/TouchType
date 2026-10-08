@@ -43,6 +43,25 @@
     <section id="screen-home" class="screen">
       <h1 class="big-title" id="home-greeting">Hi!</h1>
       <div id="focus-home-note" class="focus-home-note" hidden><span>◎ Focus mode</span><strong>Today's practice only</strong><span class="muted">Extra activities are tucked away. Progress and Settings stay available.</span></div>
+      <section id="path-home" class="path-home" hidden aria-label="Your learning journey">
+        <div class="path-hero">
+          <div class="path-hero-copy">
+            <div class="path-eyebrow">YOUR LEARNING PATH · ONE STEP AT A TIME</div>
+            <h2 id="path-headline">Build the habit. Watch it grow.</h2>
+            <p id="path-encouragement" class="path-support">Every accurate movement makes the next one easier.</p>
+            <div class="path-hero-metrics">
+              <div><strong id="path-stage">Stage 1 of 10</strong><span>Current skill</span></div>
+              <div><strong id="path-fluent">0</strong><span>Fluent words</span></div>
+              <div><strong id="path-checkpoints">0</strong><span>Checkpoints</span></div>
+            </div>
+          </div>
+          <div class="path-motif" aria-hidden="true"><div class="path-ring"><span>F</span><span>J</span></div><span class="path-motif-caption">Small moves.<br>Strong patterns.</span></div>
+        </div>
+        <div class="path-route">
+          <div class="path-route-top"><strong>Today's route</strong><span id="path-route-sub">Learn → Use → Remember</span></div>
+          <div class="path-route-steps"><span><b>01</b> Build</span><span><b>02</b> Use in sentences</span><span><b>03</b> Recall</span><span><b>04</b> Check progress</span></div>
+        </div>
+      </section>
       <div class="card continue-card adaptive-card" id="home-continue">
         <div>
           <div class="eyebrow">Today's adaptive practice</div>
@@ -78,6 +97,10 @@
         <button class="nav-card" id="nav-analytics"><span class="nav-icon">📈</span><span>Analytics</span></button>
         
       </div>
+      <section id="path-checkpoint-card" class="card path-checkpoint-card" hidden>
+        <div><div class="eyebrow">Consistent speed measurement</div><h2>Your word checkpoint</h2><p class="muted" id="path-checkpoint-summary">Repeat the same familiar words to see genuine progress.</p></div>
+        <button id="btn-checkpoint" class="btn">Check my word speed →</button>
+      </section>
       <nav class="home-utility-nav" aria-label="Learning tools">
         <button id="nav-progress" class="utility-link"><span aria-hidden="true">↗</span> My Progress</button>
         <button id="nav-settings" class="utility-link"><span aria-hidden="true">⚙</span> Settings</button>
@@ -255,6 +278,14 @@
     <!-- Progress -->
     <section id="screen-progress" class="screen">
       <div class="screen-head"><h1>My Progress</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <section class="card trajectory-card" id="trajectory-card" aria-label="Measured and expected typing progress">
+        <div class="trajectory-heading"><div><div class="eyebrow">Learning trajectory</div><h2>Your speed, on the same words</h2></div><span id="trajectory-status" class="trajectory-pill">Calibrating</span></div>
+        <p class="muted">The checkpoint uses identical words within each stage. A new stage gets its own baseline. Adaptive lessons use different words and cannot be compared directly.</p>
+        <div id="trajectory-summary" class="trajectory-summary"></div>
+        <div id="trajectory-chart" class="trajectory-chart" role="img" aria-label="Speed checkpoint trajectory"></div>
+        <p class="muted small" id="trajectory-explanation"></p>
+        <div class="trajectory-actions"><button class="btn primary" id="btn-progress-checkpoint">Take a word checkpoint →</button><span class="muted small">100 WPM is an optional long-term ambition, not a five-week promise.</span></div>
+      </section>
       <div class="results-grid card" id="progress-summary"></div>
       <div class="progress-two">
         <div class="card">
@@ -304,6 +335,19 @@
       <div class="card"><div class="eyebrow">Adaptive SRS</div><h2>Word mastery & review state</h2><p class="muted">Retention and stability are the scheduler's current estimates; “Due now” means TouchType is likely to surface that motor pattern again.</p><div class="table-wrap"><table id="analytics-words-table"></table></div></div>
     </section>
 
+    <!-- Comparable speed checkpoint -->
+    <section id="screen-checkpoint-intro" class="screen">
+      <div class="screen-head"><h1>Word speed checkpoint</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <div class="card checkpoint-intro">
+        <div class="eyebrow">Measurement, not a lesson</div>
+        <h2>Same words. Same order. A fairer comparison.</h2>
+        <p id="checkpoint-intro-detail"></p>
+        <p class="muted">Type accurately at a comfortable pace. Your result is saved separately from learning drills and won't advance the review scheduler. Use it occasionally, ideally after a break—not repeatedly to chase a score.</p>
+        <div class="checkpoint-words" id="checkpoint-word-preview"></div>
+        <div class="row wrap"><button id="btn-checkpoint-start" class="btn primary big">Start checkpoint →</button><button class="btn ghost" data-go="progress">View trajectory</button></div>
+      </div>
+    </section>
+
     <!-- Settings -->
     <section id="screen-settings" class="screen">
       <div class="screen-head"><h1>Settings</h1><button class="btn ghost" data-go="home">← Home</button></div>
@@ -316,6 +360,8 @@
         <label class="toggle"><input type="checkbox" id="set-hands"><span>Show hands</span></label>
         <label class="toggle"><input type="checkbox" id="set-focus"><span>Simplify Home <small>Hide games, tests and extra panels. Typing keeps its normal aids unless Focus is turned on separately while typing.</small></span></label>
         <label class="toggle"><span>Appearance <small>Dark is the default. Switch to light at any time.</small></span><select id="set-theme"><option value="dark">Dark</option><option value="light">Light</option></select></label>
+        <label class="toggle"><span>Home design <small>Switch between the existing layout and the learning-first journey. Your progress is shared between both.</small></span><select id="set-experience"><option value="classic">Original TouchType</option><option value="path">Learning Path · Studio + Journey</option></select></label>
+        <label class="toggle"><span>Motivation style <small>Choose what helps this learner feel engaged. No public leaderboards or pressure.</small></span><select id="set-motivation"><option value="steady">Reassurance · one step at a time</option><option value="curious">Curiosity · explore new patterns</option><option value="challenge">Personal challenge · beat your own baseline</option></select></label>
         <label class="toggle"><span>Spaced review system <small>Adaptive uses delayed retention, accuracy and fluency to choose the next interval. Classic uses the original fixed ladder.</small></span>
           <select id="set-srs"><option value="adaptive">Adaptive motor SRS</option><option value="ladder">Classic 1 · 3 · 7 · 14 · 30 days</option></select></label>
         <label class="toggle"><input type="checkbox" id="set-unlock"><span>Unlock all lessons <small>(for grown-ups; normally a lesson needs 2 stars to unlock the next)</small></span></label>
