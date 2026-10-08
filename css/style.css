@@ -627,3 +627,20 @@ body[data-theme="dark"] .weak-card h2 {color:#f2f5fc;background-color:#25364b;}
 
 #screen-progress.progress-studio .trajectory-dot.adjusted{background:#05d66e}
 #screen-progress.progress-studio .trajectory-dot.peck{background:#b68aff}
+
+/* Cohesive ink-black theme for the complete application, not only the chart. */
+body[data-theme="dark"]{--bg:#050608;--card:#11151d;--ink:#f3f5fa;--muted:#a8b4c6;--line:#2a303b;--primary:#8faeff;--primary-dark:#567adf;--shadow:0 14px 38px #0005;background:#050608;color:var(--ink)}
+body[data-theme="dark"] .card,body[data-theme="dark"] .profile-card,body[data-theme="dark"] .nav-card{background:#11151d;border:1px solid #282f3b;box-shadow:0 12px 35px #0003}
+body[data-theme="dark"] .profile-card.selected,body[data-theme="dark"] .avatar-picker button.selected{border-color:#84aaff;background:#1c2940}
+body[data-theme="dark"] .icon-btn,body[data-theme="dark"] .profile-chip{background:#1b2330;border:1px solid #303a4b;color:#e9eef8;box-shadow:none}
+body[data-theme="dark"] .btn:not(.primary):not(.danger){background:#242e3e;color:#e9eef8;border:1px solid #394456;box-shadow:none}
+body[data-theme="dark"] .btn.primary{background:#7096ff;color:#071020;box-shadow:0 4px 0 #3b59a8}
+body[data-theme="dark"] input:not([type=range]):not([type=checkbox]),body[data-theme="dark"] select,body[data-theme="dark"] textarea{background:#0d1420;color:#f3f5fa;border:1px solid #354153}
+body[data-theme="dark"] input::placeholder{color:#9aa7b8}
+body[data-theme="dark"] .trajectory-card{background:#050608}
+body[data-theme="dark"] .footer{color:#99a7b8}
+.touchtype-account-dialog::backdrop{background:#000b;backdrop-filter:blur(6px)}
+.touchtype-account-dialog button{border-radius:12px;padding:9px 15px;cursor:pointer}
+.touchtype-account-dialog #touchtype-auth-host{width:100%}
+.touchtype-account-dialog apps-auth-panel{--auth-bg:#111821;--auth-fg:#f3f6fa;--auth-muted:#a9b5c6;--auth-border:#364253;--auth-accent:#7ca2ff;--auth-accent-2:#4b79eb;--auth-soft:#192334;--auth-danger:#ff8193}
+@media(min-width:1280px){#app{max-width:1250px}}
