@@ -14,6 +14,8 @@ KQ.DEFAULT_SETTINGS = {
   showHands: true,
   focusMode: false,
   theme: "dark",
+  experience: "classic",
+  motivation: "steady",
   srsMode: "adaptive",
   level: "kid",
 };
@@ -23,6 +25,7 @@ function ensureAdaptive(profile) {
   profile.transitionStats = profile.transitionStats || {};
   profile.wordSkills = profile.wordSkills || {};
   profile.drillRecords = profile.drillRecords || [];
+  profile.benchmarkRecords = profile.benchmarkRecords || [];
   profile.adaptiveStage = Number(profile.adaptiveStage || 0);
   return profile;
 }
@@ -101,6 +104,7 @@ KQ.store = {
       transitionStats: {},
       wordSkills: {},
       drillRecords: [],
+      benchmarkRecords: [],
       adaptiveStage: 0,
       history: [],
       bests: { rain: 0, race: 0, bubbles: 0 },
@@ -229,6 +233,15 @@ KQ.store = {
     }, record || {});
     profile.drillRecords.unshift(row);
     if (profile.drillRecords.length > 1000) profile.drillRecords.length = 1000;
+    this.save();
+    return row;
+  },
+
+  recordBenchmark(profile, record) {
+    ensureAdaptive(profile);
+    const row = Object.assign({date:new Date().toISOString()}, record || {});
+    profile.benchmarkRecords.unshift(row);
+    if (profile.benchmarkRecords.length > 300) profile.benchmarkRecords.length = 300;
     this.save();
     return row;
   },
