@@ -76,7 +76,7 @@ KQ.trajectory = (() => {
     const combined=actual.concat(estimated);
     const maxX=Math.max(7,...combined.map(p=>p.x));
     const minY=Math.max(0,Math.floor(Math.min(...combined.map(p=>p.y))*0.8/5)*5);
-    const maxY=Math.max(minY+10,Math.ceil(Math.max(...combined.map(p=>p.y)*1.18)/5)*5);
+    const maxY=Math.max(minY+10,Math.ceil(Math.max(...combined.map(p=>p.y))*1.18/5)*5);
     const X=x=>52+Math.max(0,x)/maxX*620;
     const Y=y=>230-(y-minY)/(maxY-minY)*188;
     const path=pts=>pts.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+' '+Y(p.y).toFixed(1)).join(' ');
