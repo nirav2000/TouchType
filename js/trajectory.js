@@ -98,7 +98,12 @@ KQ.trajectory = (() => {
     const maxX=sameDay?Math.max(1,actual.length-1):Math.max(7,...combined.map(p=>p.x));
     const minY=Math.max(0,Math.floor(Math.min(...combined.map(p=>p.y))*0.8/5)*5);
     const maxY=Math.max(minY+10,Math.ceil(Math.max(...combined.map(p=>p.y))*1.18/5)*5);
-    const X=x=>52+Math.max(0,x)/maxX*620;
+    const showAccuracy=profile.settings?.chartShowAccuracy===true;
+    const AY=a=>230-Math.max(0,Math.min(100,a))/100*188;
+    const detailPoints=sameDay?touchAttempts.map((r,i)=>({x:i,y:r.wpm,accuracy:r.accuracy,adjusted:adjustedValue(r),date:r.date,n:1})):data.points.map(p=>({x:(p.t-origin)/DAY,y:p.wpm,accuracy:p.accuracy,adjusted:p.adjusted,date:p.day,n:p.n}));
+    const describe=p=>[(p.n>1?"Daily median of "+p.n+" tests":"Checkpoint"),p.y+" WPM",p.accuracy+"% accuracy",p.adjusted+" adjusted WPM",new Date(p.date).toLocaleString("en-GB")].join(" · ");
+    const point=(p,y,color)=>`<circle class="trajectory-point" tabindex="0" role="button" aria-label="${esc(describe(p))}" data-detail="${esc(describe(p))}" cx="${X(p.x)}" cy="${y}" r="6" fill="${color}"><title>${esc(describe(p))}</title></circle>`;
+    const X=x=>52+Math.max(0,x)/maxX*608;
     const Y=y=>230-(y-minY)/(maxY-minY)*188;
     const path=pts=>pts.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+' '+Y(p.y).toFixed(1)).join(' ');
     const forecastPath=data.forecast.length && actual.length ? path([actual[actual.length-1],...estimated]):"";
@@ -109,9 +114,19 @@ KQ.trajectory = (() => {
       (adjusted.length>1?'<path d="'+path(adjusted)+'" fill="none" stroke="#00bd67" stroke-width="2.5" stroke-linecap="round"/>':'')+
       adjusted.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="3" fill="#00bd67"><title>Adjusted '+p.y+' WPM</title></circle>').join('')+
       peck.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="6" fill="#a8a1f6"><title>Peck '+p.y+' WPM at '+p.accuracy+'% accuracy</title></circle>').join('')+
-      actual.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="5" fill="#1689ff"><title>'+p.y+' WPM</title></circle>').join('')+
+      detailPoints.map(p=>point(p,Y(p.y),"#1689ff")).join("")+
+      (showAccuracy&&detailPoints.length>1?`<path d="${detailPoints.map((p,i)=>(i?"L":"M")+X(p.x)+" "+AY(p.accuracy)).join(" ")}" fill="none" stroke="#f5bb66" stroke-width="2.5"/>`:"")+
+      (showAccuracy?detailPoints.map(p=>point(p,AY(p.accuracy),"#f5bb66")).join(""):"")+
+      (showAccuracy?[0,25,50,75,100].map(a=>`<text x="680" y="${AY(a)+4}" font-size="11" fill="#f5bb66">${a}%</text>`).join(""):"")+
       (forecastPath?'<path d="'+forecastPath+'" fill="none" stroke="#a8a1f6" stroke-width="2.5" stroke-dasharray="7 7"/>':'')+
-      '</svg><div class="trajectory-legend"><span><i class="trajectory-dot"></i>Touch WPM</span><span><i class="trajectory-dot adjusted"></i>Accuracy-adjusted touch WPM</span><span><i class="trajectory-dot peck"></i>Peck typing WPM</span>'+(data.forecast.length?'<span><i class="trajectory-dot predicted"></i>Conditional planning guide</span>':'')+'</div>';
+      '</svg><div class="trajectory-legend"><span><i class="trajectory-dot"></i>Touch WPM</span><span><i class="trajectory-dot adjusted"></i>Accuracy-adjusted touch WPM</span><span><i class="trajectory-dot peck"></i>Peck typing WPM</span>'+(data.forecast.length?'<span><i class="trajectory-dot predicted"></i>Conditional planning guide</span>':'')+'<label class="trajectory-accuracy-toggle"><input type="checkbox" id="trajectory-show-accuracy" '+(showAccuracy?'checked':'')+'> Accuracy (right axis)</label></div><div id="trajectory-point-detail" class="trajectory-point-detail" aria-live="polite">Tap or hover over a point for details.</div>';
+    const detailBox=document.getElementById("trajectory-point-detail");
+    chart.querySelectorAll(".trajectory-point").forEach(el=>{
+      const show=()=>{detailBox.textContent=el.getAttribute("data-detail");chart.querySelectorAll(".trajectory-point").forEach(p=>p.classList.toggle("selected",p===el));};
+      el.addEventListener("pointerenter",show);el.addEventListener("focus",show);el.addEventListener("click",show);
+      el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();show();}});
+    });
+    document.getElementById("trajectory-show-accuracy")?.addEventListener("change",e=>{profile.settings=profile.settings||{};profile.settings.chartShowAccuracy=e.target.checked;KQ.store.save();render(profile);});
     explanation.textContent=!data.calibrated
       ?"Only "+data.points.length+" distinct touch-typing checkpoint day(s) so far. "+(sameDay?"The chart displays individual attempts on this day; long-term progress uses one daily median. ":"")+"Four days spanning at least a week are needed before considering a forecast. Keep using the adaptive schedule; test after a break."
       :!data.rising
