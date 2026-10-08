@@ -1016,6 +1016,12 @@
     }
   }
 
+  window.addEventListener("touchtype:workspace-changed",()=>{
+    state.profile=store.current();
+    if(state.profile){KQ.audio.enabled=settings().sound;updateChip();go("home")}
+    else go("profiles");
+  });
+
   // ---------- boot ----------
   store.load();
   loadVersion();
