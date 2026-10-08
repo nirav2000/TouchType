@@ -26,7 +26,13 @@ function merge(local,remote){
 async function sync(){if(busy||!auth.currentUser||auth.currentUser.uid!==OWNER){pending=true;return;}busy=true;
  try{const ref=doc(db,'touchtype_users',OWNER);const snap=await getDoc(ref);const local=getLocal();const merged=merge(local,snap.exists()?snap.data():{profiles:[]});
  KQ.store.data=merged;const original=KQ.store.save;KQ.store.save=function(){try{localStorage.setItem('touchtype:v1',JSON.stringify(merged))}catch(e){status('local storage unavailable')}};KQ.store.save();KQ.store.save=original;
- await setDoc(ref,{app:'touchtype',schemaVersion:1,updatedAt:serverTimestamp(),profiles:merged.profiles,currentId:merged.currentId});pending=false;remoteReady=true;status('synced');
+ await setDoc(ref,{app:'touchtype',schemaVersion:1,updatedAt:serverTimestamp(),profiles:merged.profiles,currentId:merged.currentId});
+ for(const profile of merged.profiles){
+  const access=membershipDoc(OWNER,profile);
+  await setDoc(access,{uid:OWNER,learnerId:learnerId(profile),role:'parent',createdAt:serverTimestamp()},{merge:true});
+  await setDoc(learnerDoc(profile),{learnerId:learnerId(profile),ownerUid:OWNER,profile,updatedAt:serverTimestamp()},{merge:true});
+ }
+ pending=false;remoteReady=true;status('synced');
  }catch(e){pending=true;status('sync failed: '+e.message)}finally{busy=false;}}
 // Wrap the existing save method; never replace the app's local-first persistence.
 const originalSave=KQ.store.save.bind(KQ.store);
