@@ -64,10 +64,12 @@ function adaptiveDelayDays(cur, sample, now) {
 
 KQ.store = {
   data: null,
+  accountUid: null,
+  storageKey: STORAGE_KEY,
 
   load() {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+      const raw = localStorage.getItem(this.storageKey) || (this.accountUid ? null : localStorage.getItem(LEGACY_STORAGE_KEY));
       this.data = raw ? JSON.parse(raw) : null;
     } catch (e) {
       this.data = null;
@@ -80,7 +82,7 @@ KQ.store = {
   },
 
   save() {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data)); } catch (e) { /* storage unavailable */ }
+    try { localStorage.setItem(this.storageKey, JSON.stringify(this.data)); } catch (e) { /* storage unavailable */ }
   },
 
   profiles() { return this.data.profiles; },
