@@ -71,7 +71,7 @@ importButton.onclick=()=>{if(auth.currentUser?.uid!==OWNER)return status('Import
  const guest=JSON.parse(localStorage.getItem('touchtype:v1')||'{"profiles":[]}');
  if(!guest.profiles?.length)return status('No local profiles to import');
  if(!confirm('Copy '+guest.profiles.length+' local profiles into your signed-in account? The originals will remain on this device.'))return;
- KQ.store.data=merge(KQ.store.data,guest);KQ.store.save();sync();window.dispatchEvent(new Event('touchtype:workspace-changed'));
+ KQ.store.acceptCloudData(merge(KQ.store.data,guest));sync();
 };
 const actions=document.createElement('div');actions.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:12px';actions.append(syncButton,signOutButton,importButton);dialog.append(legacyForm,actions);document.body.append(dialog);
 legacyForm.onsubmit=async e=>{e.preventDefault();submit.disabled=true;try{await signInWithEmailAndPassword(auth,email.value,password.value);password.value=''}catch(err){status('Sign-in failed: '+(err.code||err.message))}finally{submit.disabled=false}};
