@@ -1,6 +1,6 @@
 // TouchType local-first cloud snapshots. The existing kk-syllabus owner account controls access.
 import {initializeApp,getApps,getApp} from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js';
-import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,signOut} from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
+import {getAuth,onAuthStateChanged,signInWithEmailAndPassword,createUserWithEmailAndPassword,sendPasswordResetEmail,signOut} from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js';
 import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from 'https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js';
 const config={apiKey:'AIzaSyDrreK9rhsoOpIYNr4QeNZ7CsXgQiMPW0E',authDomain:'kk-syllabus.firebaseapp.com',projectId:'kk-syllabus',storageBucket:'kk-syllabus.firebasestorage.app',messagingSenderId:'821660665663',appId:'1:821660665663:web:c708860329bb97dc24758a'};
 const app=getApps().find(a=>a.name==='touchtype-cloud')||initializeApp(config,'touchtype-cloud');
@@ -43,7 +43,14 @@ const originalSave=KQ.store.save.bind(KQ.store);
 KQ.store.save=function(){originalSave();if(!auth.currentUser||auth.currentUser.uid!==OWNER)return;pending=true;clearTimeout(KQ.store._cloudTimer);KQ.store._cloudTimer=setTimeout(sync,1600)};
 onAuthStateChanged(auth,user=>{if(user?.uid===OWNER){KQ.store.switchAccount(user.uid);status('syncing');sync()}else{KQ.store.switchAccount(user?.uid||null);status(user?'Cloud access pending':'Sign in to sync')}window.dispatchEvent(new Event('touchtype:workspace-changed'))});
 import('https://nirav2000.github.io/Apps/auth/v1/index.js').then(async ({Auth})=>{
-  await Auth.init({appId:'touchtype',mode:'shadow',appAdapter:{
+  await Auth.init({appId:'touchtype',mode:'shadow',identityProvider:{
+    init(){return {user:auth.currentUser}},currentUser(){return auth.currentUser},
+    onChange(handler){return onAuthStateChanged(auth,handler)},
+    signInEmail(email,password){return signInWithEmailAndPassword(auth,email,password)},
+    createEmailAccount(email,password){return createUserWithEmailAndPassword(auth,email,password)},
+    resetPassword(email){return sendPasswordResetEmail(auth,email)},
+    getIdToken(){return auth.currentUser?.getIdToken()},logout(){return signOut(auth)}
+  },appAdapter:{
     init({setAppIdentity}){onAuthStateChanged(auth,user=>setAppIdentity(user,{roles:user?.uid===OWNER?['parent']:[]}));return {user:auth.currentUser,roles:auth.currentUser?.uid===OWNER?['parent']:[]}},
     getIdToken(){return auth.currentUser?.getIdToken()},
     onChange(handler){return onAuthStateChanged(auth,user=>handler(user,user?.uid===OWNER?['parent']:[]))},
@@ -56,7 +63,7 @@ const panel=document.createElement('div');
 panel.style.cssText='position:fixed;bottom:56px;right:12px;z-index:998';
 const open=document.createElement('button');open.id='touchtype-cloud-login';open.textContent='Account & sync';
 open.style.cssText='padding:10px 15px;border-radius:12px;cursor:pointer';panel.append(open);document.body.append(panel);
-const dialog=document.createElement('dialog');dialog.style.cssText='border:0;border-radius:22px;padding:18px;max-width:min(94vw,500px);width:100%;background:#fff;color:#172235';
+const dialog=document.createElement('dialog');dialog.className='touchtype-account-dialog';dialog.style.cssText='border:1px solid #303b4d;border-radius:24px;padding:22px;max-width:min(94vw,520px);width:100%;background:#0b0d12;color:#f6f7fb';
 const head=document.createElement('div');head.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px';
 const title=document.createElement('strong');title.textContent='Your TouchType account';
 const close=document.createElement('button');close.textContent='Close';close.onclick=()=>dialog.close();head.append(title,close);dialog.append(head);
@@ -76,11 +83,12 @@ importButton.onclick=()=>{if(auth.currentUser?.uid!==OWNER)return status('Import
 };
 const actions=document.createElement('div');actions.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:12px';actions.append(syncButton,signOutButton,importButton);dialog.append(legacyForm,actions);document.body.append(dialog);
 legacyForm.onsubmit=async e=>{e.preventDefault();submit.disabled=true;try{await signInWithEmailAndPassword(auth,email.value,password.value);password.value=''}catch(err){status('Sign-in failed: '+(err.code||err.message))}finally{submit.disabled=false}};
-open.onclick=async()=>{if(window.TouchTypeSharedAuth && window.TouchTypeSharedAuth.snapshot()?.migration?.authority==='central'){
- try{await import('https://nirav2000.github.io/Apps/auth/v1/ui.js');
-  if(!authMount.firstElementChild){const el=document.createElement('apps-auth-panel');el.setAttribute('variant','balanced');el.setAttribute('theme','playful');el.setAttribute('methods','emailPassword');authMount.append(el)}
-  legacyForm.hidden=true;
+open.onclick=async()=>{
+ legacyForm.hidden=true;
+ try{
+  await import('https://nirav2000.github.io/Apps/auth/v1/ui.js');
+  if(!authMount.firstElementChild){const el=document.createElement('apps-auth-panel');el.setAttribute('variant','balanced');el.setAttribute('theme','playful');el.setAttribute('methods','emailPassword');el.setAttribute('heading','Your TouchType account');el.setAttribute('subheading','Save your typing progress and pick up on another device.');authMount.append(el)}
  }catch(err){legacyForm.hidden=false;status('Shared account UI unavailable')}
- }else legacyForm.hidden=!auth.currentUser;
- dialog.showModal()};
-onAuthStateChanged(auth,user=>{signOutButton.hidden=!user;syncButton.hidden=!user;importButton.hidden=user?.uid!==OWNER;legacyForm.hidden=!!user});
+ dialog.showModal();
+};
+onAuthStateChanged(auth,user=>{signOutButton.hidden=!user;syncButton.hidden=!user;importButton.hidden=user?.uid!==OWNER;legacyForm.hidden=!!user||!!authMount.firstElementChild});
