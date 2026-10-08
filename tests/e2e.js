@@ -151,6 +151,16 @@ function check(name, cond) {
     check("forecast appears only with measured rising trend", calibration.ready);
     check("low-accuracy checkpoints remain visible in measurements", calibration.included);
 
+    const sameDayGraph=await page.evaluate(()=>{
+      const p=KQ.store.current(),id=KQ.buildBenchmark(p).id,now=new Date().toISOString();
+      const original=p.benchmarkRecords;
+      p.benchmarkRecords=[{benchmarkId:id,date:now,wpm:26,accuracy:88,method:"touch"},{benchmarkId:id,date:now,wpm:27,accuracy:96,method:"touch"}];
+      KQ.trajectory.render(p);
+      const svg=document.querySelector("#trajectory-chart svg");
+      const result={twoRows:document.querySelectorAll("#trajectory-rows tr").length===2,twoBluePoints:svg?.querySelectorAll('circle[fill="#1689ff"]').length===2,blueLine:!!svg?.querySelector('path[stroke="#1689ff"]'),oneDay:KQ.trajectory.summarize(p).points.length===1};
+      p.benchmarkRecords=original;KQ.trajectory.render(p);return result;
+    });
+    check("same-day checkpoint attempts display individually",sameDayGraph.twoRows&&sameDayGraph.twoBluePoints&&sameDayGraph.blueLine&&sameDayGraph.oneDay);
     check("checkpoint does not count as adaptive drill", !(await profile()).drillRecords.some(d=>d.mode==="benchmark"));
     await page.click("#btn-results-next");
     check("trajectory displays recorded checkpoint", /checkpoint/i.test(await page.$eval("#trajectory-card",e=>e.innerText)));
