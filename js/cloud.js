@@ -36,7 +36,7 @@ async function sync(){if(busy||!auth.currentUser||auth.currentUser.uid!==OWNER){
  }catch(e){pending=true;status('sync failed: '+e.message)}finally{busy=false;}}
 // Wrap the existing save method; never replace the app's local-first persistence.
 const originalSave=KQ.store.save.bind(KQ.store);
-KQ.store.save=function(){originalSave();pending=true;clearTimeout(KQ.store._cloudTimer);KQ.store._cloudTimer=setTimeout(sync,1600)};
+KQ.store.save=function(){originalSave();if(!auth.currentUser||auth.currentUser.uid!==OWNER)return;pending=true;clearTimeout(KQ.store._cloudTimer);KQ.store._cloudTimer=setTimeout(sync,1600)};
 onAuthStateChanged(auth,user=>{if(user?.uid===OWNER){KQ.store.switchAccount(user.uid);status('syncing');sync()}else{KQ.store.switchAccount(user?.uid||null);status(user?'Cloud access pending':'Sign in to sync')}window.dispatchEvent(new Event('touchtype:workspace-changed'))});
 import('https://nirav2000.github.io/Apps/auth/v1/index.js').then(async ({Auth})=>{
   await Auth.init({appId:'touchtype',mode:'shadow',appAdapter:{
