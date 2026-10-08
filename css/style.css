@@ -549,3 +549,9 @@ body.learning-path .card{box-shadow:0 8px 25px rgba(0,0,0,.06)}
   .profile-chip #chip-name{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
 @media(max-width:360px){.profile-chip #chip-name{display:none}}
+
+/* Contrast safeguard for the adaptive learning instructions and metadata. */
+body[data-theme="dark"] .adaptive-meta span,
+body[data-theme="dark"] .method-flow span:nth-child(odd),
+body[data-theme="dark"] .weak-card,
+body[data-theme="dark"] .weak-card h2 {color:#f2f5fc;background-color:#25364b;}
