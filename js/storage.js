@@ -66,6 +66,21 @@ KQ.store = {
   data: null,
   accountUid: null,
   storageKey: STORAGE_KEY,
+  switchAccount(uid) {
+    const next=uid||null;
+    if(this.accountUid===next)return false;
+    this.accountUid=next;
+    this.storageKey=next?'touchtype:account:'+next+':v1':STORAGE_KEY;
+    this.load();
+    return true;
+  },
+  acceptCloudData(data){
+    if(!data||!Array.isArray(data.profiles))throw new Error('Invalid cloud data');
+    this.data=data;
+    this.data.profiles.forEach(ensureAdaptive);
+    this.save();
+    window.dispatchEvent(new Event('touchtype:workspace-changed'));
+  },
 
   load() {
     try {
@@ -82,7 +97,8 @@ KQ.store = {
   },
 
   save() {
-    try { localStorage.setItem(this.storageKey, JSON.stringify(this.data)); } catch (e) { /* storage unavailable */ }
+    try { localStorage.setItem(this.storageKey, JSON.stringify(this.data)); window.dispatchEvent(new Event('touchtype:local-saved')); }
+    catch (e) { window.dispatchEvent(new CustomEvent('touchtype:storage-error',{detail:String(e)})); }
   },
 
   profiles() { return this.data.profiles; },
