@@ -350,22 +350,22 @@ body.focus-mode #screen-home.active #home-continue{margin-top:0}
 body.focus-mode #screen-home.active .big-title{margin-bottom:12px}
 
 /* During an exercise, reduce visual noise but always retain navigation. */
-body.focus-mode #screen-practice .stats .stat:first-child,
-body.focus-mode #screen-practice #stat-time,
-body.focus-mode #screen-practice #stat-time-label,
-body.focus-mode #screen-practice .kb-area,
-body.focus-mode #screen-practice .hint-line,
-body.focus-mode #screen-practice .progress-bar{display:none}
-body.focus-mode #screen-practice .practice-actions{display:flex}
-body.focus-mode:has(#screen-practice.active) #btn-sound,
-body.focus-mode:has(#screen-practice.active) #btn-profile,
-body.focus-mode:has(#screen-practice.active) .footer{display:none}
-body.focus-mode:has(#screen-practice.active) .topbar .brand{display:flex}
-body.focus-mode:has(#screen-practice.active) #app{max-width:900px;padding-top:18px}
-body.focus-mode:has(#screen-practice.active) .topbar{justify-content:space-between;padding:0 0 12px}
-body.focus-mode #screen-practice .text-display{font-size:2.15rem;line-height:1.8;padding:34px 38px;min-height:150px}
+body.practice-focus #screen-practice .stats .stat:first-child,
+body.practice-focus #screen-practice #stat-time,
+body.practice-focus #screen-practice #stat-time-label,
+body.practice-focus #screen-practice .kb-area,
+body.practice-focus #screen-practice .hint-line,
+body.practice-focus #screen-practice .progress-bar{display:none}
+body.practice-focus #screen-practice .practice-actions{display:flex}
+body.practice-focus:has(#screen-practice.active) #btn-sound,
+body.practice-focus:has(#screen-practice.active) #btn-profile,
+body.practice-focus:has(#screen-practice.active) .footer{display:none}
+body.practice-focus:has(#screen-practice.active) .topbar .brand{display:flex}
+body.practice-focus:has(#screen-practice.active) #app{max-width:900px;padding-top:18px}
+body.practice-focus:has(#screen-practice.active) .topbar{justify-content:space-between;padding:0 0 12px}
+body.practice-focus #screen-practice .text-display{font-size:2.15rem;line-height:1.8;padding:34px 38px;min-height:150px}
 @media(max-width:640px){
-  body.focus-mode #screen-practice .text-display{font-size:1.55rem;padding:24px}
+  body.practice-focus #screen-practice .text-display{font-size:1.55rem;padding:24px}
   body.focus-mode #screen-home.active .nav-grid{grid-template-columns:1fr 1fr}
 }
 
@@ -389,3 +389,39 @@ body.focus-mode #screen-practice .text-display{font-size:2.15rem;line-height:1.8
 .chart-bar:hover{opacity:1}
 .chart-empty{fill:var(--muted);font-size:16px}
 @media(max-width:780px){.analytics-grid{grid-template-columns:1fr}.analytics-head{align-items:stretch}.analytics-head>.row{justify-content:space-between}}
+
+/* Dark-first typing studio; all colour decisions flow from theme tokens. */
+body[data-theme="dark"]{
+  --bg:#0b1120;--card:#182337;--ink:#f2f5fc;--muted:#aab9ce;
+  --line:#33425c;--primary:#89aaff;--primary-dark:#5677df;
+  --good:#4adea2;--warn:#f6c55c;--bad:#fb7185;
+  --shadow:0 12px 32px rgba(0,0,0,.22);
+  background:#0b1120 radial-gradient(circle at 20% 0%,#182944 0,transparent 48%) fixed;
+}
+body[data-theme="dark"] .continue-card{background:linear-gradient(135deg,#1d2d49,#182337)}
+body[data-theme="dark"] .btn{background:#2a3952;color:var(--ink)}
+body[data-theme="dark"] .btn.primary{background:#6b8ff7;color:#071020;box-shadow:0 5px 0 #415fba}
+body[data-theme="dark"] .btn.ghost{background:transparent;color:var(--muted)}
+body[data-theme="dark"] .btn.ghost:hover{background:#283853;color:var(--ink)}
+body[data-theme="dark"] input[type="text"],
+body[data-theme="dark"] select,
+body[data-theme="dark"] textarea{background:#101b2e;color:var(--ink);border-color:var(--line)}
+body[data-theme="dark"] .avatar-picker button{background:#283751}
+body[data-theme="dark"] .avatar-picker button.selected{background:#314d81}
+body[data-theme="dark"] .progress-bar{background:#33425c}
+body[data-theme="dark"] .text-display .c{color:#aab9ce}
+body[data-theme="dark"] .key-chip{color:#101827}
+body[data-theme="dark"] .finger-tag{color:#101827}
+body[data-theme="dark"] .focus-home-note{background:#24344c;border-color:var(--line)}
+body[data-theme="dark"] #btn-focus.active{background:#354d80;box-shadow:0 0 0 2px var(--primary)}
+body[data-theme="dark"] .chart-point{fill:var(--card)}
+body[data-theme="dark"] .nav-card:hover,body[data-theme="dark"] .profile-card:hover{background:#21314a}
+body[data-theme="dark"] .icon-btn,body[data-theme="dark"] .profile-chip{color:var(--ink)}
+.home-utility-nav{display:flex;justify-content:center;gap:12px;margin:20px 0 6px;flex-wrap:wrap}
+.utility-link{border:1px solid var(--line);border-radius:999px;background:transparent;color:var(--muted);font:inherit;font-weight:800;font-size:.9rem;padding:9px 16px;cursor:pointer}
+.utility-link:hover,.utility-link:focus-visible{background:var(--card);color:var(--ink);outline-color:var(--primary)}
+.focus-toggle{display:flex;align-items:center;justify-content:center;gap:5px;width:auto;min-width:86px;padding:0 12px;border-radius:999px;font-size:.85rem;font-weight:900}
+.focus-toggle>span:first-child{font-size:1.3rem}
+.focus-toggle.active{color:var(--primary)}
+body.focus-mode #screen-home.active .home-utility-nav{display:flex}
+body.focus-mode #screen-home.active #nav-settings,body.focus-mode #screen-home.active #nav-progress{display:inline-flex}
