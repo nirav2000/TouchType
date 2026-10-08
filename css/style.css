@@ -506,3 +506,18 @@ body.learning-path .card{box-shadow:0 8px 25px rgba(0,0,0,.06)}
 
 /* Hidden state always wins over layout rules, including flex cards. */
 .path-home[hidden],.path-checkpoint-card[hidden]{display:none!important}
+
+/* Keep all header controls usable on narrow phones without page overflow. */
+@media(max-width:520px){
+  #app{padding-left:12px;padding-right:12px}
+  .topbar{gap:6px}
+  .topbar-right{gap:5px;min-width:0}
+  .brand{font-size:1.08rem;white-space:nowrap}
+  body.learning-path .brand{font-size:1.08rem}
+  .focus-toggle{min-width:40px;width:40px;padding:0;flex-shrink:0}
+  .focus-toggle #focus-button-label{display:none}
+  .icon-btn{width:38px;height:38px;flex-shrink:0}
+  .profile-chip{padding:4px 7px;gap:3px;min-width:0}
+  .profile-chip #chip-name{max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+}
+@media(max-width:360px){.profile-chip #chip-name{display:none}}
