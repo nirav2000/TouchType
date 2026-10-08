@@ -122,7 +122,8 @@
   }
   $("btn-focus").addEventListener("click", () => {
     if (!state.profile) return;
-    settings().focusMode = !settings().focusMode;
+    const s = settings();
+    s.focusMode = !s.focusMode;
     store.save();
     applyFocusMode();
   });
@@ -130,8 +131,9 @@
   $("btn-home").addEventListener("click", () => (state.profile ? go("home") : go("profiles")));
   $("btn-sound").addEventListener("click", () => {
     if (!state.profile) return;
-    settings().sound = !settings().sound;
-    KQ.audio.enabled = settings().sound;
+    const s = settings();
+    s.sound = !s.sound;
+    KQ.audio.enabled = s.sound;
     store.save();
     updateChip();
   });
