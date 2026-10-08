@@ -461,7 +461,9 @@
   $("btn-quit").addEventListener("click", quitPractice);
   $("btn-restart").addEventListener("click", () => {
     stopTimer();
-    if (state.mode === "test") startSpeedTest(); else startExercise();
+    if (state.mode === "test") startSpeedTest();
+    else if (state.mode === "benchmark") startBenchmark();
+    else startExercise();
   });
 
   function openBenchmark() {
