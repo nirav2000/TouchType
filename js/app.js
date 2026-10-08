@@ -842,6 +842,14 @@
     KQ.analytics.render(state.profile, $("analytics-range").value || "30");
   }
   $("analytics-range").addEventListener("change", renderAnalytics);
+  for(const [id,key] of [["trajectory-min-accuracy","chartMinAccuracy"],["trajectory-penalty","chartPenalty"]]){
+    document.getElementById(id)?.addEventListener("change",e=>{
+      if(!state.profile)return;
+      settings()[key]=Number(e.target.value);
+      store.save();
+      KQ.trajectory.render(state.profile);
+    });
+  }
 
   function renderProgress() {
     const p = state.profile;
@@ -851,6 +859,8 @@
     const accs = p.history.filter((h) => h.acc != null);
     const avgAcc = accs.length ? Math.round(accs.reduce((a, h) => a + h.acc, 0) / accs.length) : 0;
     const snap = store.learningSnapshot(p);
+    document.getElementById("trajectory-min-accuracy").value=String(settings().chartMinAccuracy??0);
+    document.getElementById("trajectory-penalty").value=String(settings().chartPenalty??1);
     if (KQ.trajectory) KQ.trajectory.render(p);
     const status = KQ.adaptiveStageStatus(p);
     $("progress-summary").innerHTML = [
