@@ -38,6 +38,15 @@ async function sync(){if(busy||!auth.currentUser||auth.currentUser.uid!==OWNER){
 const originalSave=KQ.store.save.bind(KQ.store);
 KQ.store.save=function(){originalSave();pending=true;clearTimeout(KQ.store._cloudTimer);KQ.store._cloudTimer=setTimeout(sync,1600)};
 onAuthStateChanged(auth,user=>{if(user?.uid===OWNER){KQ.store.switchAccount(user.uid);status('syncing');sync()}else{KQ.store.switchAccount(user?.uid||null);status(user?'Cloud access pending':'Sign in to sync')}window.dispatchEvent(new Event('touchtype:workspace-changed'))});
+import('https://nirav2000.github.io/Apps/auth/v1/index.js').then(async ({Auth})=>{
+  await Auth.init({appId:'touchtype',mode:'shadow',appAdapter:{
+    init({setAppIdentity}){onAuthStateChanged(auth,user=>setAppIdentity(user,{roles:user?.uid===OWNER?['parent']:[]}));return {user:auth.currentUser,roles:auth.currentUser?.uid===OWNER?['parent']:[]}},
+    getIdToken(){return auth.currentUser?.getIdToken()},
+    onChange(handler){return onAuthStateChanged(auth,user=>handler(user,user?.uid===OWNER?['parent']:[]))},
+    logout(){return signOut(auth)}
+  }});
+  window.TouchTypeSharedAuth=Auth;
+}).catch(e=>status('Shared Auth unavailable: '+e.message));
 window.TouchTypeCloud={signIn:(email,password)=>signInWithEmailAndPassword(auth,email,password),signOut:()=>signOut(auth),sync,auth};
 const panel=document.createElement('div');panel.style.cssText='position:fixed;bottom:54px;right:12px;z-index:998';panel.innerHTML='<button id="touchtype-cloud-login" style="padding:8px 12px;border-radius:9px">Cloud account</button>';document.body.append(panel);
 panel.querySelector('button').onclick=async()=>{if(auth.currentUser){await sync();return;}const email=prompt('kk-syllabus account email');if(!email)return;const password=prompt('Password');if(!password)return;try{await signInWithEmailAndPassword(auth,email,password)}catch(e){status('sign-in failed: '+e.code)}};
