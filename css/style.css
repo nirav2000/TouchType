@@ -425,3 +425,81 @@ body[data-theme="dark"] .icon-btn,body[data-theme="dark"] .profile-chip{color:va
 .focus-toggle.active{color:var(--primary)}
 body.focus-mode #screen-home.active .home-utility-nav{display:flex}
 body.focus-mode #screen-home.active #nav-settings,body.focus-mode #screen-home.active #nav-progress{display:inline-flex}
+
+/* Learning Path is a deliberately different, opt-in learning environment.
+   Original TouchType remains unchanged when experience=classic. */
+body.learning-path {
+  --path-bg:#0d1721;--path-panel:#172a36;--path-panel-soft:#203744;
+  --path-accent:#83e0c5;--path-ink:#eaf7f2;--path-muted:#b0c7c5;
+}
+body.learning-path[data-theme="dark"]{
+  --bg:#0d1721;--card:#172a36;--ink:#eaf7f2;--muted:#b0c7c5;
+  --line:#345360;--primary:#83e0c5;--primary-dark:#479e8a;
+  background:#0d1721 radial-gradient(circle at 88% 6%,#183f48 0,transparent 42%) fixed;
+}
+body.learning-path[data-theme="light"]{
+  --path-bg:#eef5ef;--path-panel:#ffffff;--path-panel-soft:#e0f0e9;
+  --path-accent:#177967;--path-ink:#183c37;--path-muted:#506c64;
+  --bg:#eef5ef;--card:#fff;--ink:#183c37;--muted:#506c64;
+  --line:#cadbd5;--primary:#177967;--primary-dark:#0d5345;
+  background:#eef5ef radial-gradient(circle at 90% 0%,#d6f0e7 0,transparent 45%) fixed;
+}
+body.learning-path .brand{letter-spacing:-.04em;font-size:1.45rem}
+body.learning-path #screen-home .big-title{text-align:left;font-size:1.35rem;font-weight:750;color:var(--muted);margin:8px 0 16px}
+body.learning-path #screen-home .method-card{display:none}
+body.learning-path #screen-home #home-continue{border:1px solid var(--line);background:var(--card);box-shadow:none;border-radius:18px}
+body.learning-path #screen-home .nav-card{box-shadow:none;border:1px solid var(--line);font-size:.9rem;padding:15px}
+body.learning-path #screen-home .nav-icon{font-size:1.3rem}
+body.learning-path #screen-home .nav-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+body.learning-path .btn.primary{background:var(--primary);color:#092d28;box-shadow:0 4px 0 var(--primary-dark)}
+body.learning-path[data-theme="light"] .btn.primary{color:#fff}
+body.learning-path .card{box-shadow:0 8px 25px rgba(0,0,0,.06)}
+.path-home{margin-bottom:16px}
+.path-hero{position:relative;overflow:hidden;display:flex;justify-content:space-between;gap:20px;padding:30px 34px;border-radius:22px;background:linear-gradient(125deg,var(--path-panel),var(--path-panel-soft));border:1px solid var(--line);color:var(--ink)}
+.path-hero-copy{position:relative;z-index:1;flex:1;min-width:0}
+.path-eyebrow{font-size:.72rem;font-weight:850;letter-spacing:.13em;color:var(--primary);margin-bottom:13px}
+.path-hero h2{font-size:clamp(1.65rem,3vw,2.7rem);line-height:1.13;letter-spacing:-.035em;margin-bottom:13px;max-width:580px}
+.path-support{color:var(--muted);font-size:1.05rem;max-width:570px}
+.path-hero-metrics{display:flex;flex-wrap:wrap;gap:25px;margin-top:26px}
+.path-hero-metrics>div{display:flex;flex-direction:column;gap:4px}
+.path-hero-metrics strong{font-size:1.35rem}
+.path-hero-metrics span{font-size:.76rem;color:var(--muted)}
+.path-motif{min-width:155px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.path-ring{width:130px;height:130px;border:1px solid var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;gap:9px;transform:rotate(-12deg);box-shadow:0 0 0 15px color-mix(in srgb,var(--primary) 9%,transparent),0 0 0 29px color-mix(in srgb,var(--primary) 5%,transparent)}
+.path-ring span{font:900 2.2rem var(--mono);color:var(--primary)}
+.path-motif-caption{font-size:.75rem;text-align:center;color:var(--muted)}
+.path-route{padding:17px 24px;margin:12px 0;border:1px solid var(--line);border-radius:16px;background:var(--card)}
+.path-route-top{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:.85rem}
+.path-route-top span{color:var(--muted)}
+.path-route-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}
+.path-route-steps>span{font-size:.8rem;padding:9px 10px;border-radius:9px;background:color-mix(in srgb,var(--primary) 10%,var(--card))}
+.path-route-steps b{color:var(--primary);margin-right:7px}
+.path-checkpoint-card{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border:1px solid var(--line);box-shadow:none}
+.path-checkpoint-card h2{margin:6px 0}
+.path-checkpoint-card p{max-width:600px}
+.path-checkpoint-card .btn{border:1px solid var(--line)}
+.trajectory-card{margin-bottom:22px}
+.trajectory-heading{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.trajectory-pill{border:1px solid var(--line);color:var(--muted);padding:6px 12px;border-radius:999px;font-size:.8rem;font-weight:800}
+.trajectory-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:18px 0}
+.trajectory-metric{border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;flex-direction:column;gap:6px}
+.trajectory-metric strong{font-size:1.55rem}
+.trajectory-metric span{font-size:.76rem;color:var(--muted)}
+.trajectory-chart{border:1px solid var(--line);border-radius:14px;padding:14px;min-height:220px;overflow:hidden}
+.trajectory-chart svg{display:block;width:100%;height:auto;max-height:280px}
+.trajectory-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;min-height:180px;color:var(--muted);max-width:510px;margin:auto}
+.trajectory-empty strong{color:var(--ink)}
+.trajectory-legend{display:flex;gap:18px;flex-wrap:wrap;font-size:.75rem;color:var(--muted);padding:0 10px}
+.trajectory-dot{display:inline-block;width:10px;height:10px;border-radius:50%;background:#55c6a9;margin-right:6px}
+.trajectory-dot.predicted{background:#a8a1f6}
+.trajectory-actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:16px}
+.checkpoint-intro{max-width:790px;margin-inline:auto}
+.checkpoint-words{border:1px solid var(--line);background:color-mix(in srgb,var(--primary) 6%,var(--card));padding:18px;border-radius:12px;font:500 1.05rem/1.9 var(--mono);margin:16px 0 24px}
+@media(max-width:680px){
+  .path-hero{padding:23px 20px}
+  .path-motif{display:none}
+  .path-route-steps{grid-template-columns:repeat(2,1fr)}
+  body.learning-path #screen-home .nav-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .trajectory-summary{grid-template-columns:1fr}
+  .trajectory-chart{padding:6px}
+}
