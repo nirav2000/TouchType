@@ -281,7 +281,7 @@
       <section class="card trajectory-card" id="trajectory-card" aria-label="Measured and expected typing progress">
         <div class="trajectory-heading"><div><div class="eyebrow">Learning trajectory</div><h2>Your speed, on the same words</h2></div><span id="trajectory-status" class="trajectory-pill">Calibrating</span></div>
         <p class="muted">The checkpoint uses identical words within each stage. A new stage gets its own baseline. Adaptive lessons use different words and cannot be compared directly.</p>
-        <div id="trajectory-summary" class="trajectory-summary"></div>
+        <div class="row wrap"><label>Minimum accuracy <select id="trajectory-min-accuracy"><option value="0">Any accuracy</option><option value="50">50%+</option><option value="70">70%+</option><option value="80">80%+</option><option value="90">90%+</option><option value="95">95%+</option><option value="98">98%+</option></select></label><label>Inaccuracy penalty <select id="trajectory-penalty"><option value="0">None</option><option value="0.5">Gentle (0.5×)</option><option value="1" selected>Proportional (1×)</option><option value="1.5">1.5×</option><option value="2">Strong (2×)</option><option value="3">Very strong (3×)</option></select></label></div><div id="trajectory-summary" class="trajectory-summary"></div>
         <div id="trajectory-chart" class="trajectory-chart" role="img" aria-label="Speed checkpoint trajectory"></div>
         <p class="muted small" id="trajectory-explanation"></p>
         <div class="trajectory-actions"><button class="btn primary" id="btn-progress-checkpoint">Take a word checkpoint →</button><span class="muted small">100 WPM is an optional long-term ambition, not a five-week promise.</span></div>
@@ -408,6 +408,7 @@
 <script src="js/keyboard.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/storage.js"></script>
+<script type="module" src="js/cloud.js"></script>
 <script src="js/game.js"></script>
 <script src="js/race.js"></script>
 <script src="js/bubbles.js"></script>
