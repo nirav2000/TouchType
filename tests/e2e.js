@@ -161,6 +161,16 @@ function check(name, cond) {
       p.benchmarkRecords=original;KQ.trajectory.render(p);return result;
     });
     check("same-day checkpoint attempts display individually",sameDayGraph.twoRows&&sameDayGraph.twoBluePoints&&sameDayGraph.blueLine&&sameDayGraph.oneDay);
+    const pointInteractions=await page.evaluate(()=>{
+      const p=KQ.store.current(),id=KQ.buildBenchmark(p).id,now=new Date().toISOString(),original=p.benchmarkRecords;
+      p.benchmarkRecords=[{benchmarkId:id,date:now,wpm:26,accuracy:88,method:"touch"},{benchmarkId:id,date:now,wpm:27,accuracy:96,method:"touch"}];
+      p.settings=p.settings||{};const old=p.settings.chartShowAccuracy;p.settings.chartShowAccuracy=true;KQ.trajectory.render(p);
+      const pts=document.querySelectorAll("#trajectory-chart .trajectory-point");const rightAxis=document.querySelector("#trajectory-chart svg")?.textContent.includes("100%");
+      pts[0]?.dispatchEvent(new Event("pointerenter"));const details=document.querySelector("#trajectory-point-detail")?.textContent||"";
+      const result={count:pts.length,axis:rightAxis,details:details.includes("88% accuracy")&&details.includes("26 WPM")};
+      p.settings.chartShowAccuracy=old;p.benchmarkRecords=original;KQ.trajectory.render(p);return result;
+    });
+    check("checkpoint hover details and optional accuracy axis",pointInteractions.count>=4&&pointInteractions.axis&&pointInteractions.details);
     check("checkpoint does not count as adaptive drill", !(await profile()).drillRecords.some(d=>d.mode==="benchmark"));
     await page.click("#btn-results-next");
     check("trajectory displays recorded checkpoint", /checkpoint/i.test(await page.$eval("#trajectory-card",e=>e.innerText)));
