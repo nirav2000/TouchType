@@ -67,6 +67,15 @@ KQ.trajectory = (() => {
     const chart=document.getElementById("trajectory-chart");
     const explanation=document.getElementById("trajectory-explanation");
     if(!status||!summary||!chart||!explanation)return;
+    const filtered=data.attempts.filter(r=>r.accuracy>=data.minAccuracy);
+    const latest=filtered.length?filtered[filtered.length-1]:null;
+    const adjustedValue=r=>Math.round(r.wpm*Math.pow(r.accuracy/100,data.penalty)*10)/10;
+    const count=document.getElementById("trajectory-matches");
+    const speed=document.getElementById("trajectory-adjusted");
+    const rows=document.getElementById("trajectory-rows");
+    if(count)count.textContent=filtered.length+" / "+data.attempts.length;
+    if(speed)speed.textContent=latest?adjustedValue(latest)+" WPM":"—";
+    if(rows)rows.innerHTML=filtered.slice(-25).reverse().map(r=>'<tr><td>'+esc(new Date(r.date).toLocaleDateString("en-GB",{day:"numeric",month:"short"}))+' <small>'+esc(r.method==="peck"?"Peck":"Touch")+'</small></td><td>'+esc(r.wpm)+'</td><td>'+esc(r.accuracy)+'%</td><td>'+adjustedValue(r)+'</td></tr>').join("")||'<tr><td colspan="4">No matching checkpoints</td></tr>';
     status.textContent=data.status;
     summary.innerHTML=[
       [data.last ? data.last.wpm+" WPM":"—","Latest checkpoint"],
@@ -82,7 +91,7 @@ KQ.trajectory = (() => {
     const actual=data.points.map(p=>({x:(p.t-origin)/DAY,y:p.wpm}));
     const adjusted=data.points.map(p=>({x:(p.t-origin)/DAY,y:p.adjusted}));
     const peck=data.peck.map(r=>({x:(Date.parse(dayKey(r.date)+"T12:00:00Z")-origin)/DAY,y:r.wpm,accuracy:r.accuracy}));
-    const estimated=data.forecast.map(p=>({x:data.elapsed+p.day,y:p.wpm}));
+    const estimated=data.forecast.map(p=>({x:(data.last.t-origin)/DAY+p.day,y:p.wpm}));
     const combined=actual.concat(estimated,adjusted,peck);
     const maxX=Math.max(7,...combined.map(p=>p.x));
     const minY=Math.max(0,Math.floor(Math.min(...combined.map(p=>p.y))*0.8/5)*5);
@@ -94,11 +103,11 @@ KQ.trajectory = (() => {
     chart.innerHTML='<svg viewBox="0 0 710 270" role="img" aria-label="Measured speed in solid line; conditional estimate in dashed line" preserveAspectRatio="xMidYMid meet">'+
       [0,1,2,3,4].map(i=>'<line x1="52" x2="672" y1="'+(230-i*47)+'" y2="'+(230-i*47)+'" stroke="currentColor" opacity=".11"/><text x="44" y="'+(235-i*47)+'" text-anchor="end" fill="currentColor" font-size="12">'+Math.round(minY+(maxY-minY)*i/4)+'</text>').join('')+
       '<text x="52" y="257" fill="currentColor" font-size="12">First checkpoint</text><text x="672" y="257" text-anchor="end" fill="currentColor" font-size="12">Day '+Math.round(maxX)+'</text>'+
-      (actual.length>1?'<path d="'+path(actual)+'" fill="none" stroke="#55c6a9" stroke-width="3.5" stroke-linecap="round"/>':'')+
-      (adjusted.length>1?'<path d="'+path(adjusted)+'" fill="none" stroke="#edb45a" stroke-width="2.5" stroke-linecap="round"/>':'')+
-      adjusted.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="3" fill="#edb45a"><title>Adjusted '+p.y+' WPM</title></circle>').join('')+
+      (actual.length>1?'<path d="'+path(actual)+'" fill="none" stroke="#1689ff" stroke-width="3.5" stroke-linecap="round"/>':'')+
+      (adjusted.length>1?'<path d="'+path(adjusted)+'" fill="none" stroke="#00bd67" stroke-width="2.5" stroke-linecap="round"/>':'')+
+      adjusted.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="3" fill="#00bd67"><title>Adjusted '+p.y+' WPM</title></circle>').join('')+
       peck.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="6" fill="#a8a1f6"><title>Peck '+p.y+' WPM at '+p.accuracy+'% accuracy</title></circle>').join('')+
-      actual.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="5" fill="#55c6a9"><title>'+p.y+' WPM</title></circle>').join('')+
+      actual.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="5" fill="#1689ff"><title>'+p.y+' WPM</title></circle>').join('')+
       (forecastPath?'<path d="'+forecastPath+'" fill="none" stroke="#a8a1f6" stroke-width="2.5" stroke-dasharray="7 7"/>':'')+
       '</svg><div class="trajectory-legend"><span><i class="trajectory-dot"></i>Touch WPM</span><span>🟠 Accuracy-adjusted touch WPM</span><span>🟣 Peck typing WPM</span>'+(data.forecast.length?'<span><i class="trajectory-dot predicted"></i>Conditional planning guide</span>':'')+'</div>';
     explanation.textContent=!data.calibrated
