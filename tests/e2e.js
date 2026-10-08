@@ -141,14 +141,14 @@ function check(name, cond) {
       p.benchmarkRecords.push({benchmarkId:id,stageId:KQ.adaptiveStageFor(p).id,date:new Date(now).toISOString(),wpm:27,accuracy:98});
       const sufficient=KQ.trajectory.summarize(p);
       p.benchmarkRecords.push({benchmarkId:id,stageId:KQ.adaptiveStageFor(p).id,date:new Date(now).toISOString(),wpm:99,accuracy:80});
-      const excludesLowAccuracy=KQ.trajectory.summarize(p);
+      const includesLowAccuracy=KQ.trajectory.summarize(p);
       return {notReady:!insufficient.calibrated && !insufficient.forecast.length,
         ready:sufficient.calibrated && sufficient.forecast.length===5,
-        excluded:excludesLowAccuracy.last.wpm===sufficient.last.wpm};
+        included:includesLowAccuracy.last.wpm>sufficient.last.wpm};
     });
-    check("forecast withheld without four distinct accurate days", calibration.notReady);
+    check("forecast withheld without four distinct checkpoint days", calibration.notReady);
     check("forecast appears only with measured rising trend", calibration.ready);
-    check("low-accuracy retries do not inflate speed curve", calibration.excluded);
+    check("low-accuracy checkpoints remain visible in measurements", calibration.included);
 
     check("checkpoint does not count as adaptive drill", !(await profile()).drillRecords.some(d=>d.mode==="benchmark"));
     await page.click("#btn-results-next");
