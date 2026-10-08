@@ -76,11 +76,11 @@ importButton.onclick=()=>{if(auth.currentUser?.uid!==OWNER)return status('Import
 };
 const actions=document.createElement('div');actions.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:12px';actions.append(syncButton,signOutButton,importButton);dialog.append(legacyForm,actions);document.body.append(dialog);
 legacyForm.onsubmit=async e=>{e.preventDefault();submit.disabled=true;try{await signInWithEmailAndPassword(auth,email.value,password.value);password.value=''}catch(err){status('Sign-in failed: '+(err.code||err.message))}finally{submit.disabled=false}};
-open.onclick=async()=>{if(window.TouchTypeSharedAuth){
+open.onclick=async()=>{if(window.TouchTypeSharedAuth && window.TouchTypeSharedAuth.snapshot()?.migration?.authority==='central'){
  try{await import('https://nirav2000.github.io/Apps/auth/v1/ui.js');
   if(!authMount.firstElementChild){const el=document.createElement('apps-auth-panel');el.setAttribute('variant','balanced');el.setAttribute('theme','playful');el.setAttribute('methods','emailPassword');authMount.append(el)}
   legacyForm.hidden=true;
  }catch(err){legacyForm.hidden=false;status('Shared account UI unavailable')}
- }else legacyForm.hidden=false;
+ }else legacyForm.hidden=!auth.currentUser;
  dialog.showModal()};
-onAuthStateChanged(auth,user=>{signOutButton.hidden=!user;syncButton.hidden=!user;importButton.hidden=user?.uid!==OWNER;legacyForm.hidden=!!user||!!window.TouchTypeSharedAuth});
+onAuthStateChanged(auth,user=>{signOutButton.hidden=!user;syncButton.hidden=!user;importButton.hidden=user?.uid!==OWNER;legacyForm.hidden=!!user});
