@@ -524,9 +524,7 @@
       showResults({
         eyebrow:"Word speed checkpoint",title:"A useful measurement ✓",
         stars:0,stats:st,
-        message:summary.last && summary.last.accuracy >= 95
-          ? "Saved: " + st.wpm + " WPM at " + st.accuracy + "% accuracy. Revisit after a break to see retained speed."
-          : "Saved, but accuracy is below 95%. Focus on smooth, correct movements before comparing speed.",
+        message:"Saved: " + st.wpm + " WPM at " + st.accuracy + "% accuracy. Every completed checkpoint counts, regardless of accuracy.",
         note:"This checkpoint is separate from your spaced-review practice. Speed is not a mastery requirement.",
         next:{label:"See my trajectory →",action:()=>go("progress")},
         retry:null,back:{label:"Home",action:()=>go("home")}
