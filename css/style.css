@@ -624,3 +624,6 @@ body[data-theme="dark"] .weak-card h2 {color:#f2f5fc;background-color:#25364b;}
 #screen-progress.progress-studio .trajectory-actions .btn.primary{background:#3879ff;color:#fff;box-shadow:none;padding:13px 22px}
 #screen-progress.progress-studio .trajectory-actions .btn.primary:hover{background:#5690ff}
 @media(max-width:680px){#screen-progress.progress-studio .trajectory-card{padding:17px;border-radius:16px}#screen-progress.progress-studio .trajectory-summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}#screen-progress.progress-studio .trajectory-metric{padding:11px 8px}#screen-progress.progress-studio .trajectory-metric strong{font-size:1.15rem}#screen-progress.progress-studio .trajectory-metric span{font-size:.66rem}#screen-progress.progress-studio .trajectory-chart{padding:8px;min-height:220px}#screen-progress.progress-studio .trajectory-chart svg{min-height:180px}#screen-progress.progress-studio .analysis-table th,#screen-progress.progress-studio .analysis-table td{padding:12px 5px;font-size:.78rem}}
+
+#screen-progress.progress-studio .trajectory-dot.adjusted{background:#05d66e}
+#screen-progress.progress-studio .trajectory-dot.peck{background:#b68aff}
