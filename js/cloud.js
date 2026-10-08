@@ -48,5 +48,35 @@ import('https://nirav2000.github.io/Apps/auth/v1/index.js').then(async ({Auth})=
   window.TouchTypeSharedAuth=Auth;
 }).catch(e=>status('Shared Auth unavailable: '+e.message));
 window.TouchTypeCloud={signIn:(email,password)=>signInWithEmailAndPassword(auth,email,password),signOut:()=>signOut(auth),sync,auth};
-const panel=document.createElement('div');panel.style.cssText='position:fixed;bottom:54px;right:12px;z-index:998';panel.innerHTML='<button id="touchtype-cloud-login" style="padding:8px 12px;border-radius:9px">Cloud account</button>';document.body.append(panel);
-panel.querySelector('button').onclick=async()=>{if(auth.currentUser){await sync();return;}const email=prompt('kk-syllabus account email');if(!email)return;const password=prompt('Password');if(!password)return;try{await signInWithEmailAndPassword(auth,email,password)}catch(e){status('sign-in failed: '+e.code)}};
+const panel=document.createElement('div');
+panel.style.cssText='position:fixed;bottom:56px;right:12px;z-index:998';
+const open=document.createElement('button');open.id='touchtype-cloud-login';open.textContent='Account & sync';
+open.style.cssText='padding:10px 15px;border-radius:12px;cursor:pointer';panel.append(open);document.body.append(panel);
+const dialog=document.createElement('dialog');dialog.style.cssText='border:0;border-radius:22px;padding:18px;max-width:min(94vw,500px);width:100%;background:#fff;color:#172235';
+const head=document.createElement('div');head.style.cssText='display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px';
+const title=document.createElement('strong');title.textContent='Your TouchType account';
+const close=document.createElement('button');close.textContent='Close';close.onclick=()=>dialog.close();head.append(title,close);dialog.append(head);
+const authMount=document.createElement('div');dialog.append(authMount);
+const legacyForm=document.createElement('form');legacyForm.style.cssText='display:grid;gap:10px;margin-top:12px';
+const email=document.createElement('input');email.type='email';email.placeholder='Email address';email.autocomplete='email';email.required=true;
+const password=document.createElement('input');password.type='password';password.placeholder='Password';password.autocomplete='current-password';password.required=true;
+const submit=document.createElement('button');submit.type='submit';submit.textContent='Sign in';legacyForm.append(email,password,submit);
+const signOutButton=document.createElement('button');signOutButton.textContent='Sign out';signOutButton.onclick=()=>signOut(auth);
+const syncButton=document.createElement('button');syncButton.textContent='Sync now';syncButton.onclick=sync;
+const importButton=document.createElement('button');importButton.textContent='Import local profiles into my account';
+importButton.onclick=()=>{if(auth.currentUser?.uid!==OWNER)return status('Import needs owner approval');
+ const guest=JSON.parse(localStorage.getItem('touchtype:v1')||'{"profiles":[]}');
+ if(!guest.profiles?.length)return status('No local profiles to import');
+ if(!confirm('Copy '+guest.profiles.length+' local profiles into your signed-in account? The originals will remain on this device.'))return;
+ KQ.store.data=merge(KQ.store.data,guest);KQ.store.save();sync();window.dispatchEvent(new Event('touchtype:workspace-changed'));
+};
+const actions=document.createElement('div');actions.style.cssText='display:flex;gap:8px;flex-wrap:wrap;margin-top:12px';actions.append(syncButton,signOutButton,importButton);dialog.append(legacyForm,actions);document.body.append(dialog);
+legacyForm.onsubmit=async e=>{e.preventDefault();submit.disabled=true;try{await signInWithEmailAndPassword(auth,email.value,password.value);password.value=''}catch(err){status('Sign-in failed: '+(err.code||err.message))}finally{submit.disabled=false}};
+open.onclick=async()=>{if(window.TouchTypeSharedAuth){
+ try{await import('https://nirav2000.github.io/Apps/auth/v1/ui.js');
+  if(!authMount.firstElementChild){const el=document.createElement('apps-auth-panel');el.setAttribute('variant','balanced');el.setAttribute('theme','playful');el.setAttribute('methods','emailPassword');authMount.append(el)}
+  legacyForm.hidden=true;
+ }catch(err){legacyForm.hidden=false;status('Shared account UI unavailable')}
+ }else legacyForm.hidden=false;
+ dialog.showModal()};
+onAuthStateChanged(auth,user=>{signOutButton.hidden=!user;syncButton.hidden=!user;importButton.hidden=user?.uid!==OWNER;legacyForm.hidden=!!user||!!window.TouchTypeSharedAuth});
