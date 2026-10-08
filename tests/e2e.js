@@ -140,7 +140,7 @@ function check(name, cond) {
     await page.click("#nav-settings");
     check("adaptive motor SRS is default", (await page.$eval("#set-srs",e=>e.value)) === "adaptive");
     check("classic spaced-review ladder remains available", await page.$eval("#set-srs",e=>[...e.options].some(o=>o.value==="ladder" && /1.*3.*7.*14.*30/.test(o.textContent))));
-    check("version number is visible in settings", /v0\.4\.1/.test(await page.$eval("#settings-version",e=>e.textContent)));
+    check("version number is visible in settings", /v0\.4\.2/.test(await page.$eval("#settings-version",e=>e.textContent)));
     await page.click("#set-focus");
     check("focus mode can be enabled", await page.evaluate(()=>document.body.classList.contains("focus-mode")));
     await page.click("#screen-settings [data-go=home]");
