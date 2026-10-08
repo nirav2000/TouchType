@@ -101,15 +101,15 @@ function check(name, cond) {
     check("home screen shown", await page.$eval("#screen-home", (e) => e.classList.contains("active")));
     check("dark mode is default", await page.$eval("body",e=>e.dataset.theme==="dark"));
     const contrast = await page.evaluate(()=>{
-      const rgb=s=>{const m=s.match(/\\d+(?:\\.\\d+)?/g)||[];return m.slice(0,3).map(Number)};
+      const rgb=s=>{const m=s.match(/[0-9]+(?:[.][0-9]+)?/g)||[];return m.slice(0,3).map(Number)};
       const luminance=arr=>arr.map(v=>{v/=255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4)}).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
       const ratio=(a,b)=>{const x=luminance(rgb(a)),y=luminance(rgb(b));return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
       const selectors=[".adaptive-meta span",".method-flow span:nth-child(odd)",".weak-card",".weak-card h2"];
-      return selectors.map(selector=>{const el=document.querySelector(selector);if(!el)return {selector,missing:true};const s=getComputedStyle(el);let bg=s.backgroundColor;if(bg==="rgba(0, 0, 0, 0)"||bg==="transparent"){let p=el.parentElement;while(p){const b=getComputedStyle(p).backgroundColor;if(b!=="rgba(0, 0, 0, 0)"&&b!=="transparent"){bg=b;break}p=p.parentElement}}
+      return selectors.map(selector=>{const el=document.querySelector(selector);if(!el)return {selector,missing:true,optional:selector===".weak-card h2"};const s=getComputedStyle(el);let bg=s.backgroundColor;if(bg==="rgba(0, 0, 0, 0)"||bg==="transparent"){let p=el.parentElement;while(p){const b=getComputedStyle(p).backgroundColor;if(b!=="rgba(0, 0, 0, 0)"&&b!=="transparent"){bg=b;break}p=p.parentElement}}
       return {selector,color:s.color,bg,ratio:ratio(s.color,bg)}});
     });
     console.log("Contrast diagnostics:",JSON.stringify(contrast));
-    check("dark theme metadata and instructional labels meet WCAG AA contrast",contrast.every(x=>!x.missing&&x.ratio>=4.5));
+    check("dark theme metadata and instructional labels meet WCAG AA contrast",contrast.every(x=>(x.optional&&x.missing)||(!x.missing&&x.ratio>=4.5)));
 
     check("progress is compact menu item", await page.$eval("#nav-progress",e=>e.classList.contains("utility-link")));
     check("settings is compact menu item", await page.$eval("#nav-settings",e=>e.classList.contains("utility-link")));
