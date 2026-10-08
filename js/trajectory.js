@@ -101,7 +101,7 @@ KQ.trajectory = (() => {
     const path=pts=>pts.map((p,i)=>(i?'L':'M')+X(p.x).toFixed(1)+' '+Y(p.y).toFixed(1)).join(' ');
     const forecastPath=data.forecast.length && actual.length ? path([actual[actual.length-1],...estimated]):"";
     chart.innerHTML='<svg viewBox="0 0 710 270" role="img" aria-label="Measured speed in solid line; conditional estimate in dashed line" preserveAspectRatio="xMidYMid meet">'+
-      [0,1,2,3,4].map(i=>'<line x1="52" x2="672" y1="'+(230-i*47)+'" y2="'+(230-i*47)+'" stroke="currentColor" opacity=".11"/><text x="44" y="'+(235-i*47)+'" text-anchor="end" fill="currentColor" font-size="12">'+Math.round(minY+(maxY-minY)*i/4)+'</text>').join('')+
+      [0,1,2,3,4].map(i=>'<line x1="52" x2="672" y1="'+(230-i*47)+'" y2="'+(230-i*47)+'" stroke="#566073" opacity=".34"/><text x="44" y="'+(235-i*47)+'" text-anchor="end" fill="#aab5c5" font-size="12">'+Math.round(minY+(maxY-minY)*i/4)+'</text>').join('')+
       '<text x="52" y="257" fill="currentColor" font-size="12">First checkpoint</text><text x="672" y="257" text-anchor="end" fill="currentColor" font-size="12">Day '+Math.round(maxX)+'</text>'+
       (actual.length>1?'<path d="'+path(actual)+'" fill="none" stroke="#1689ff" stroke-width="3.5" stroke-linecap="round"/>':'')+
       (adjusted.length>1?'<path d="'+path(adjusted)+'" fill="none" stroke="#00bd67" stroke-width="2.5" stroke-linecap="round"/>':'')+
@@ -109,7 +109,7 @@ KQ.trajectory = (() => {
       peck.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="6" fill="#a8a1f6"><title>Peck '+p.y+' WPM at '+p.accuracy+'% accuracy</title></circle>').join('')+
       actual.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="5" fill="#1689ff"><title>'+p.y+' WPM</title></circle>').join('')+
       (forecastPath?'<path d="'+forecastPath+'" fill="none" stroke="#a8a1f6" stroke-width="2.5" stroke-dasharray="7 7"/>':'')+
-      '</svg><div class="trajectory-legend"><span><i class="trajectory-dot"></i>Touch WPM</span><span>🟠 Accuracy-adjusted touch WPM</span><span>🟣 Peck typing WPM</span>'+(data.forecast.length?'<span><i class="trajectory-dot predicted"></i>Conditional planning guide</span>':'')+'</div>';
+      '</svg><div class="trajectory-legend"><span><i class="trajectory-dot"></i>Touch WPM</span><span><i class="trajectory-dot adjusted"></i>Accuracy-adjusted touch WPM</span><span><i class="trajectory-dot peck"></i>Peck typing WPM</span>'+(data.forecast.length?'<span><i class="trajectory-dot predicted"></i>Conditional planning guide</span>':'')+'</div>';
     explanation.textContent=!data.calibrated
       ?"Only "+data.points.length+" distinct touch-typing checkpoint day(s) so far. Four days spanning at least a week are needed before considering a forecast. Keep using the adaptive schedule; test after a break."
       :!data.rising
