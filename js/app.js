@@ -121,6 +121,10 @@
     if (note) note.hidden = !settings().focusMode;
   }
 
+  function applyTheme() {
+    document.body.dataset.theme = state.profile ? (settings().theme || "dark") : "dark";
+  }
+
   function updateChip() {
     $("chip-avatar").textContent = state.profile.avatar;
     $("chip-name").textContent = state.profile.name;
