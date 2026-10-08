@@ -581,3 +581,46 @@ body[data-theme="dark"] .weak-card h2 {color:#f2f5fc;background-color:#25364b;}
 .trajectory-chart svg{display:block;width:100%;height:auto;max-height:360px}
 .trajectory-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8rem;padding-top:12px}
 @media(max-width:560px){.analysis-table th,.analysis-table td{padding:11px 4px;font-size:.83rem}.analysis-counts strong{font-size:1.25rem}}
+
+/* Progress Studio — intentionally scoped to the progress screen.
+   Reference: edge-to-edge ink-black plot, neon data, sliders BELOW plot. */
+#screen-progress.progress-studio{--studio-bg:#050607;--studio-panel:#080a0d;--studio-line:#262b33;--studio-text:#f6f8fc;--studio-muted:#a7b0c0;--studio-blue:#138dff;--studio-green:#05d66e;--studio-peck:#b68aff;color:var(--studio-text)}
+#screen-progress.progress-studio .screen-head{padding:6px 0 18px}
+#screen-progress.progress-studio .trajectory-card{background:var(--studio-bg);color:var(--studio-text);border:1px solid #222832;border-radius:23px;box-shadow:0 20px 55px #0003;padding:clamp(18px,3.1vw,38px);margin:0 0 26px;width:100%}
+#screen-progress.progress-studio .trajectory-heading{margin-bottom:13px}
+#screen-progress.progress-studio .trajectory-heading h2{font-size:clamp(1.35rem,2.5vw,1.85rem);letter-spacing:-.025em;margin:6px 0 0}
+#screen-progress.progress-studio .trajectory-heading .eyebrow{color:#9dafff;font-size:.72rem}
+#screen-progress.progress-studio .trajectory-card .muted{color:var(--studio-muted)}
+#screen-progress.progress-studio .trajectory-pill{color:#d4dbea;background:#151a22;border-color:#333a48}
+#screen-progress.progress-studio .trajectory-summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:23px 0 16px}
+#screen-progress.progress-studio .trajectory-metric{background:#0c1016;border:1px solid #242b36;border-radius:12px;padding:16px 18px;min-width:0}
+#screen-progress.progress-studio .trajectory-metric strong{font-size:clamp(1.25rem,2.8vw,1.85rem);font-variant-numeric:tabular-nums}
+#screen-progress.progress-studio .trajectory-metric span{color:#aab4c3;font-size:.78rem}
+#screen-progress.progress-studio .trajectory-chart{background:#020305;border:1px solid #242a33;border-radius:15px;padding:clamp(10px,2vw,22px);min-height:280px;overflow:hidden}
+#screen-progress.progress-studio .trajectory-chart svg{width:100%;height:auto;max-height:none;min-height:220px;color:#aab5c5}
+#screen-progress.progress-studio .trajectory-chart svg path{vector-effect:non-scaling-stroke}
+#screen-progress.progress-studio .trajectory-legend{padding:16px 2px 2px;gap:10px 24px;color:#c2cad6;font-size:.83rem}
+#screen-progress.progress-studio .trajectory-dot{background:var(--studio-blue)}
+#screen-progress.progress-studio .trajectory-dot.predicted{background:#a78bfa}
+#screen-progress.progress-studio .typing-analysis-controls{margin:28px 0 26px;gap:24px}
+#screen-progress.progress-studio .analysis-control{gap:16px}
+#screen-progress.progress-studio .analysis-control-head{font-size:.98rem;color:#f1f4f9}
+#screen-progress.progress-studio .analysis-control-head output{font-size:1.08rem;font-weight:700}
+#screen-progress.progress-studio .analysis-control input[type=range]{background:#24272d;height:7px;width:100%;margin:5px 0 7px}
+#screen-progress.progress-studio .analysis-control input[type=range]::-webkit-slider-thumb{background:#fff;border:0;width:26px;height:26px;box-shadow:0 2px 7px #0008}
+#screen-progress.progress-studio .analysis-control input[type=range]::-moz-range-thumb{background:#fff;border:0;width:26px;height:26px;box-shadow:0 2px 7px #0008}
+#screen-progress.progress-studio .analysis-control p{color:#aeb5c1;font-size:.82rem;margin:0;line-height:1.5}
+#screen-progress.progress-studio .analysis-results{border-top:1px solid var(--studio-line);padding-top:25px;margin-top:10px}
+#screen-progress.progress-studio .analysis-counts{margin-bottom:19px}
+#screen-progress.progress-studio .analysis-counts small{color:#a7b0c0}
+#screen-progress.progress-studio .analysis-counts strong{color:#fff}
+#screen-progress.progress-studio .analysis-table{color:#eef2f8;font-size:.95rem}
+#screen-progress.progress-studio .analysis-table th{color:#c2cad5;font-size:.83rem;text-transform:none;letter-spacing:0}
+#screen-progress.progress-studio .analysis-table th,#screen-progress.progress-studio .analysis-table td{border-bottom:1px solid #272c34;padding:15px 10px}
+#screen-progress.progress-studio .analysis-table tbody tr:last-child td{border-bottom:0}
+#screen-progress.progress-studio .analysis-table td small{color:#aab4c5}
+#screen-progress.progress-studio #trajectory-explanation{margin:20px 0 0;line-height:1.6}
+#screen-progress.progress-studio .trajectory-actions{margin-top:23px}
+#screen-progress.progress-studio .trajectory-actions .btn.primary{background:#3879ff;color:#fff;box-shadow:none;padding:13px 22px}
+#screen-progress.progress-studio .trajectory-actions .btn.primary:hover{background:#5690ff}
+@media(max-width:680px){#screen-progress.progress-studio .trajectory-card{padding:17px;border-radius:16px}#screen-progress.progress-studio .trajectory-summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}#screen-progress.progress-studio .trajectory-metric{padding:11px 8px}#screen-progress.progress-studio .trajectory-metric strong{font-size:1.15rem}#screen-progress.progress-studio .trajectory-metric span{font-size:.66rem}#screen-progress.progress-studio .trajectory-chart{padding:8px;min-height:220px}#screen-progress.progress-studio .trajectory-chart svg{min-height:180px}#screen-progress.progress-studio .analysis-table th,#screen-progress.progress-studio .analysis-table td{padding:12px 5px;font-size:.78rem}}
