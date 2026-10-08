@@ -209,6 +209,8 @@ function check(name, cond) {
     check("focus practice keeps Home navigation", await page.$eval("#btn-home",e=>getComputedStyle(e).display!=="none"));
     check("focus practice keeps quit/back control", await page.$eval("#btn-quit",e=>getComputedStyle(e).display!=="none"));
     await page.click("#btn-home");
+    await page.click("#btn-focus");
+    check("home activities restored after leaving focus", await page.$eval("#nav-lessons",e=>getComputedStyle(e).display!=="none"));
 
     console.log("Lessons and mastery");
     await page.click("#nav-lessons"); await wait(150);
