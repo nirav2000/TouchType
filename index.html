@@ -6,15 +6,15 @@
   <title>TouchType — Learn to Type</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%8C%A8%EF%B8%8F%3C/text%3E%3C/svg%3E">
   <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#4f6df5">
+  <meta name="theme-color" content="#101827">
   <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
+<body data-theme="dark">
 <div id="app">
   <header class="topbar">
     <button class="brand" id="btn-home" title="Home">⌨️ <span>TouchType</span></button>
     <div class="topbar-right">
-      <button id="btn-focus" class="icon-btn" title="Focus mode" aria-pressed="false">◎</button>
+      <button id="btn-focus" class="icon-btn focus-toggle" title="Focus mode" aria-label="Turn on Focus mode" aria-pressed="false"><span aria-hidden="true">◎</span><span id="focus-button-label">Focus</span></button>
       <button id="btn-sound" class="icon-btn" title="Sound on/off">🔊</button>
       <button id="btn-profile" class="profile-chip" title="Switch typist"><span id="chip-avatar"></span><span id="chip-name"></span></button>
     </div>
@@ -74,10 +74,14 @@
         <button class="nav-card" id="nav-lessons"><span class="nav-icon">📚</span><span>Extra lessons</span></button>
         <button class="nav-card" id="nav-games"><span class="nav-icon">🎮</span><span>Games</span></button>
         <button class="nav-card" id="nav-test"><span class="nav-icon">⏱️</span><span>Speed Test</span></button>
-        <button class="nav-card" id="nav-progress"><span class="nav-icon">⭐</span><span>My Progress</span></button>
+        
         <button class="nav-card" id="nav-analytics"><span class="nav-icon">📈</span><span>Analytics</span></button>
-        <button class="nav-card" id="nav-settings"><span class="nav-icon">⚙️</span><span>Settings</span></button>
+        
       </div>
+      <nav class="home-utility-nav" aria-label="Learning tools">
+        <button id="nav-progress" class="utility-link"><span aria-hidden="true">↗</span> My Progress</button>
+        <button id="nav-settings" class="utility-link"><span aria-hidden="true">⚙</span> Settings</button>
+      </nav>
     </section>
 
     <!-- Lessons -->
@@ -310,7 +314,8 @@
         <label class="toggle"><input type="checkbox" id="set-stop"><span>Wait for the right key after a mistake <small>(off: keep going, fix with Backspace)</small></span></label>
         <label class="toggle"><input type="checkbox" id="set-keyboard"><span>Show on-screen keyboard</span></label>
         <label class="toggle"><input type="checkbox" id="set-hands"><span>Show hands</span></label>
-        <label class="toggle"><input type="checkbox" id="set-focus"><span>Focus mode <small>Simplify Home to today's practice, Progress and Settings; during typing hide optional visual aids while keeping Home/back/quit available.</small></span></label>
+        <label class="toggle"><input type="checkbox" id="set-focus"><span>Simplify Home <small>Hide games, tests and extra panels. Typing keeps its normal aids unless Focus is turned on separately while typing.</small></span></label>
+        <label class="toggle"><span>Appearance <small>Dark is the default. Switch to light at any time.</small></span><select id="set-theme"><option value="dark">Dark</option><option value="light">Light</option></select></label>
         <label class="toggle"><span>Spaced review system <small>Adaptive uses delayed retention, accuracy and fluency to choose the next interval. Classic uses the original fixed ladder.</small></span>
           <select id="set-srs"><option value="adaptive">Adaptive motor SRS</option><option value="ladder">Classic 1 · 3 · 7 · 14 · 30 days</option></select></label>
         <label class="toggle"><input type="checkbox" id="set-unlock"><span>Unlock all lessons <small>(for grown-ups; normally a lesson needs 2 stars to unlock the next)</small></span></label>
