@@ -504,6 +504,29 @@ KQ.buildAdaptivePlan = function(profile) {
   };
 };
 
+// Identical real-word checkpoint within each adaptive stage. This is intentionally
+// separate from adaptive drills: changing word sets would invalidate a speed trend.
+// Its word selection and order must stay fixed under the versioned benchmark ID.
+KQ.buildBenchmark = function (profile) {
+  const stage = KQ.adaptiveStageFor(profile);
+  const all = wordsFor(stage.allowedSet).filter((w) => /^[a-z]{2,}$/.test(w)).sort();
+  const focus = all.filter((w) => [...stage.newKeys].some((ch) => w.includes(ch)));
+  const words = [...new Set(focus.slice(0, 8).concat(all.filter((w) => w.length >= 3).slice(0, 6), all))].slice(0, 12);
+  // One full run of the same words at the same difficulty, with no random shuffling.
+  // About 170-210 characters: enough for a usable WPM snapshot without a long test.
+  const items = [];
+  while (items.join(" ").length < 170 && items.length < 55 && words.length) {
+    items.push(words[items.length % words.length]);
+  }
+  return {
+    id: "familiar-" + stage.id + "-v1",
+    stageId: stage.id,
+    stageTitle: stage.title,
+    words,
+    text: items.join(" "),
+  };
+};
+
 // ---------- weak-key practice ----------
 // Keys the learner struggles with, limited to keys they have actually learned.
 KQ.weakKeys = function (keyStats, allowed, n = 4) {
