@@ -88,12 +88,14 @@ KQ.trajectory = (() => {
       return;
     }
     const origin=Math.min(...data.attempts.map(r=>Date.parse(dayKey(r.date)+"T12:00:00Z")));
-    const actual=data.points.map(p=>({x:(p.t-origin)/DAY,y:p.wpm}));
-    const adjusted=data.points.map(p=>({x:(p.t-origin)/DAY,y:p.adjusted}));
+    const sameDay=data.points.length===1 && data.attempts.filter(r=>(r.method||"touch")==="touch" && r.accuracy>=data.minAccuracy).length>1;
+    const touchAttempts=data.attempts.filter(r=>(r.method||"touch")==="touch" && r.accuracy>=data.minAccuracy);
+    const actual=sameDay?touchAttempts.map((r,i)=>({x:i,y:r.wpm})):data.points.map(p=>({x:(p.t-origin)/DAY,y:p.wpm}));
+    const adjusted=sameDay?touchAttempts.map((r,i)=>({x:i,y:adjustedValue(r)})):data.points.map(p=>({x:(p.t-origin)/DAY,y:p.adjusted}));
     const peck=data.peck.map(r=>({x:(Date.parse(dayKey(r.date)+"T12:00:00Z")-origin)/DAY,y:r.wpm,accuracy:r.accuracy}));
     const estimated=data.forecast.map(p=>({x:(data.last.t-origin)/DAY+p.day,y:p.wpm}));
     const combined=actual.concat(estimated,adjusted,peck);
-    const maxX=Math.max(7,...combined.map(p=>p.x));
+    const maxX=sameDay?Math.max(1,actual.length-1):Math.max(7,...combined.map(p=>p.x));
     const minY=Math.max(0,Math.floor(Math.min(...combined.map(p=>p.y))*0.8/5)*5);
     const maxY=Math.max(minY+10,Math.ceil(Math.max(...combined.map(p=>p.y))*1.18/5)*5);
     const X=x=>52+Math.max(0,x)/maxX*620;
@@ -102,7 +104,7 @@ KQ.trajectory = (() => {
     const forecastPath=data.forecast.length && actual.length ? path([actual[actual.length-1],...estimated]):"";
     chart.innerHTML='<svg viewBox="0 0 710 270" role="img" aria-label="Measured speed in solid line; conditional estimate in dashed line" preserveAspectRatio="xMidYMid meet">'+
       [0,1,2,3,4].map(i=>'<line x1="52" x2="672" y1="'+(230-i*47)+'" y2="'+(230-i*47)+'" stroke="#566073" opacity=".34"/><text x="44" y="'+(235-i*47)+'" text-anchor="end" fill="#aab5c5" font-size="12">'+Math.round(minY+(maxY-minY)*i/4)+'</text>').join('')+
-      '<text x="52" y="257" fill="currentColor" font-size="12">First checkpoint</text><text x="672" y="257" text-anchor="end" fill="currentColor" font-size="12">Day '+Math.round(maxX)+'</text>'+
+      '<text x="52" y="257" fill="currentColor" font-size="12">First checkpoint</text><text x="672" y="257" text-anchor="end" fill="currentColor" font-size="12">'+(sameDay?'Attempt '+actual.length:'Day '+Math.round(maxX))+'</text>'+
       (actual.length>1?'<path d="'+path(actual)+'" fill="none" stroke="#1689ff" stroke-width="3.5" stroke-linecap="round"/>':'')+
       (adjusted.length>1?'<path d="'+path(adjusted)+'" fill="none" stroke="#00bd67" stroke-width="2.5" stroke-linecap="round"/>':'')+
       adjusted.map(p=>'<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="3" fill="#00bd67"><title>Adjusted '+p.y+' WPM</title></circle>').join('')+
@@ -111,7 +113,7 @@ KQ.trajectory = (() => {
       (forecastPath?'<path d="'+forecastPath+'" fill="none" stroke="#a8a1f6" stroke-width="2.5" stroke-dasharray="7 7"/>':'')+
       '</svg><div class="trajectory-legend"><span><i class="trajectory-dot"></i>Touch WPM</span><span><i class="trajectory-dot adjusted"></i>Accuracy-adjusted touch WPM</span><span><i class="trajectory-dot peck"></i>Peck typing WPM</span>'+(data.forecast.length?'<span><i class="trajectory-dot predicted"></i>Conditional planning guide</span>':'')+'</div>';
     explanation.textContent=!data.calibrated
-      ?"Only "+data.points.length+" distinct touch-typing checkpoint day(s) so far. Four days spanning at least a week are needed before considering a forecast. Keep using the adaptive schedule; test after a break."
+      ?"Only "+data.points.length+" distinct touch-typing checkpoint day(s) so far. "+(sameDay?"The chart displays individual attempts on this day; long-term progress uses one daily median. ":"") Four days spanning at least a week are needed before considering a forecast. Keep using the adaptive schedule; test after a break."
       :!data.rising
         ?"Your data do not yet show a stable rising trend. No forecast is shown. Changes in difficulty, fatigue, practice gaps and accuracy can affect speed; keep working on fluent movements."
         :"Dashed line: a capped, diminishing-returns planning estimate based on this stage's daily median checkpoints, assuming continued scheduled practice. It is NOT a validated prediction or confidence interval. Gains may slow, stop or reverse; a new stage resets the benchmark.";
