@@ -117,7 +117,11 @@ KQ.store = {
   },
 
   settings(profile) {
-    profile.settings = Object.assign({}, KQ.DEFAULT_SETTINGS, profile.settings || {});
+    // Preserve object identity: callers may mutate the returned settings object.
+    if (!profile.settings) profile.settings = {};
+    for (const [key, value] of Object.entries(KQ.DEFAULT_SETTINGS)) {
+      if (profile.settings[key] === undefined) profile.settings[key] = value;
+    }
     return profile.settings;
   },
 
