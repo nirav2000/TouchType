@@ -24,7 +24,10 @@ function merge(local,remote){
  return {profiles:[...profiles.values()],currentId:local.currentId||remote.currentId||null};
 }
 async function sync(){if(busy||!auth.currentUser||auth.currentUser.uid!==OWNER){pending=true;return;}busy=true;
- try{const ref=doc(db,'touchtype_users',OWNER);const snap=await getDoc(ref);const local=getLocal();const merged=merge(local,snap.exists()?snap.data():{profiles:[]});
+ const accountAtStart=auth.currentUser.uid;
+ try{const ref=doc(db,'touchtype_users',OWNER);const snap=await getDoc(ref);if(auth.currentUser?.uid!==accountAtStart)return;
+ const local=getLocal();const merged=merge(local,snap.exists()?snap.data():{profiles:[]});
+ if(auth.currentUser?.uid!==accountAtStart)return;
  KQ.store.acceptCloudData(merged);
  await setDoc(ref,{app:'touchtype',schemaVersion:1,updatedAt:serverTimestamp(),profiles:merged.profiles,currentId:merged.currentId});
  for(const profile of merged.profiles){
