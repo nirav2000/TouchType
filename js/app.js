@@ -843,10 +843,11 @@
   }
   $("analytics-range").addEventListener("change", renderAnalytics);
   for(const [id,key] of [["trajectory-min-accuracy","chartMinAccuracy"],["trajectory-penalty","chartPenalty"]]){
-    document.getElementById(id)?.addEventListener("change",e=>{
+    document.getElementById(id)?.addEventListener("input",e=>{
       if(!state.profile)return;
       settings()[key]=Number(e.target.value);
-      store.save();
+      const label=document.getElementById(id==="trajectory-min-accuracy"?"trajectory-min-label":"trajectory-penalty-label");
+      if(label)label.textContent=id==="trajectory-min-accuracy"?e.target.value+"%":Number(e.target.value).toFixed(2).replace(/0$/,"")+"×";
       KQ.trajectory.render(state.profile);
     });
   }
@@ -861,6 +862,8 @@
     const snap = store.learningSnapshot(p);
     document.getElementById("trajectory-min-accuracy").value=String(settings().chartMinAccuracy??0);
     document.getElementById("trajectory-penalty").value=String(settings().chartPenalty??1);
+    document.getElementById("trajectory-min-label").textContent=String(settings().chartMinAccuracy??0)+"%";
+    document.getElementById("trajectory-penalty-label").textContent=Number(settings().chartPenalty??1).toFixed(2).replace(/0$/,"")+"×";
     if (KQ.trajectory) KQ.trajectory.render(p);
     const status = KQ.adaptiveStageStatus(p);
     $("progress-summary").innerHTML = [
