@@ -503,3 +503,6 @@ body.learning-path .card{box-shadow:0 8px 25px rgba(0,0,0,.06)}
   .trajectory-summary{grid-template-columns:1fr}
   .trajectory-chart{padding:6px}
 }
+
+/* Hidden state always wins over layout rules, including flex cards. */
+.path-home[hidden],.path-checkpoint-card[hidden]{display:none!important}
