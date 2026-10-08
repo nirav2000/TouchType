@@ -21,6 +21,7 @@
     gameName: null,
     selectedAvatar: AVATARS[0],
     selectedLevel: "kid",
+    practiceFocus: false,
   };
 
   // ---------- navigation ----------
@@ -28,6 +29,8 @@
     for (const el of document.querySelectorAll(".screen")) el.classList.remove("active");
     $("screen-" + name).classList.add("active");
     state.screen = name;
+    if (name !== "practice") state.practiceFocus = false;
+    if (state.profile) applyFocusMode();
     $("btn-profile").classList.toggle("hidden", name === "profiles");
     if (name !== "practice") stopTimer();
     if (state.game && name !== state.gameName) { state.game.stop(); state.game = null; }
@@ -105,26 +108,35 @@
   $("new-name").addEventListener("keydown", (e) => { if (e.key === "Enter") createProfile(); });
 
   function applyFocusMode() {
-    const on = !!settings().focusMode;
-    document.body.classList.toggle("focus-mode", on);
+    const inPractice = state.screen === "practice";
+    const on = inPractice ? state.practiceFocus : !!settings().focusMode;
+    document.body.classList.toggle("focus-mode", !!settings().focusMode);
+    document.body.classList.toggle("practice-focus", inPractice && on);
     $("btn-focus").setAttribute("aria-pressed", String(on));
     $("btn-focus").classList.toggle("active", on);
-    $("btn-focus").title = on ? "Leave focus mode" : "Focus mode";
+    $("btn-focus").title = inPractice ? (on ? "Restore typing aids" : "Focus while typing") : (on ? "Show all Home activities" : "Simplify Home");
+    $("btn-focus").setAttribute("aria-label", $("btn-focus").title);
+    $("focus-button-label").textContent = on ? "Focus on" : "Focus";
     const note = $("focus-home-note");
-    if (note) note.hidden = !on;
+    if (note) note.hidden = !settings().focusMode;
   }
 
   function updateChip() {
     $("chip-avatar").textContent = state.profile.avatar;
     $("chip-name").textContent = state.profile.name;
     $("btn-sound").textContent = settings().sound ? "🔊" : "🔇";
+    applyTheme();
     applyFocusMode();
   }
   $("btn-focus").addEventListener("click", () => {
     if (!state.profile) return;
-    const s = settings();
-    s.focusMode = !s.focusMode;
-    store.save();
+    if (state.screen === "practice") {
+      state.practiceFocus = !state.practiceFocus;
+    } else {
+      const s = settings();
+      s.focusMode = !s.focusMode;
+      store.save();
+    }
     applyFocusMode();
   });
   $("btn-profile").addEventListener("click", () => go("profiles"));
@@ -819,6 +831,7 @@
     sel.innerHTML = Object.entries(KQ.LEVELS).map(([k, v]) => `<option value="${k}">${KQ.escapeHtml(v.label)} (${KQ.escapeHtml(v.ages)})</option>`).join("");
     sel.value = level();
     $("set-srs").value = settings().srsMode || "adaptive";
+    $("set-theme").value = settings().theme || "dark";
     applyFocusMode();
   }
   for (const [k, id] of Object.entries(SETTING_IDS)) {
@@ -830,6 +843,11 @@
     });
   }
   $("set-level").addEventListener("change", (e) => { settings().level = e.target.value; store.save(); });
+  $("set-theme").addEventListener("change", (e) => {
+    settings().theme = e.target.value === "light" ? "light" : "dark";
+    store.save();
+    applyTheme();
+  });
   $("set-srs").addEventListener("change", (e) => {
     settings().srsMode = e.target.value === "ladder" ? "ladder" : "adaptive";
     store.save();
