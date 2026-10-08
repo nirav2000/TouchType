@@ -517,6 +517,7 @@
       const b = state.benchmark;
       store.recordBenchmark(state.profile, {
         benchmarkId:b.id,stageId:b.stageId,stageTitle:b.stageTitle,
+        method:document.getElementById("checkpoint-method")?.value || "touch",
         wpm:st.wpm,accuracy:st.accuracy,errors:st.errors,
         seconds:st.seconds,chars:b.text.length
       });
