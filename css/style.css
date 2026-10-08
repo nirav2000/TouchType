@@ -644,3 +644,10 @@ body[data-theme="dark"] .footer{color:#99a7b8}
 .touchtype-account-dialog #touchtype-auth-host{width:100%}
 .touchtype-account-dialog apps-auth-panel{--auth-bg:#111821;--auth-fg:#f3f6fa;--auth-muted:#a9b5c6;--auth-border:#364253;--auth-accent:#7ca2ff;--auth-accent-2:#4b79eb;--auth-soft:#192334;--auth-danger:#ff8193}
 @media(min-width:1280px){#app{max-width:1250px}}
+
+/* Checkpoint interaction: readable details, keyboard focus and touch-sized targets. */
+#screen-progress.progress-studio .trajectory-point{cursor:pointer;stroke:#050608;stroke-width:2;outline:none}
+#screen-progress.progress-studio .trajectory-point:is(:focus,.selected){stroke:#fff;stroke-width:3;filter:drop-shadow(0 0 4px #ffffff77)}
+#screen-progress.progress-studio .trajectory-point-detail{margin-top:12px;padding:12px 15px;min-height:48px;border:1px solid #303947;border-radius:12px;background:#111722;color:#e5ebf6;font-size:.88rem;line-height:1.5}
+#screen-progress.progress-studio .trajectory-accuracy-toggle{display:inline-flex;align-items:center;gap:9px;margin-left:auto;cursor:pointer;color:#f5bb66}
+#screen-progress.progress-studio .trajectory-accuracy-toggle input{width:18px;height:18px;accent-color:#f5bb66}
