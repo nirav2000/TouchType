@@ -13,6 +13,7 @@ KQ.DEFAULT_SETTINGS = {
   showKeyboard: true,
   showHands: true,
   focusMode: false,
+  theme: "dark",
   srsMode: "adaptive",
   level: "kid",
 };
