@@ -2,9 +2,15 @@
   "appId": "touchtype",
   "platformVersion": "1.5.0",
   "capabilities": {
-    "monitor": true
+    "monitor": true,
+    "auth": {
+      "mode": "shadow"
+    },
+    "firebaseUsage": {}
   },
-  "ui": {"mode": "headless"},
+  "ui": {
+    "mode": "headless"
+  },
   "versionLab": {
     "enabled": true,
     "managed": true,
