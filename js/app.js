@@ -22,6 +22,7 @@
     selectedAvatar: AVATARS[0],
     selectedLevel: "kid",
     practiceFocus: false,
+    benchmark: null,
   };
 
   // ---------- navigation ----------
@@ -130,6 +131,7 @@
     $("chip-name").textContent = state.profile.name;
     $("btn-sound").textContent = settings().sound ? "🔊" : "🔇";
     applyTheme();
+    document.body.classList.toggle("learning-path", settings().experience === "path");
     applyFocusMode();
   }
   $("btn-focus").addEventListener("click", () => {
@@ -155,6 +157,32 @@
   });
 
   // ---------- home ----------
+  function renderLearningPath(plan) {
+    const p = state.profile, s = settings(), active = s.experience === "path";
+    document.body.classList.toggle("learning-path", active);
+    $("path-home").hidden = !active;
+    $("path-checkpoint-card").hidden = !active;
+    if (!active) return;
+    const status = plan.status;
+    const stageNumber = (plan.stage.index || 0) + 1;
+    const snapshots = KQ.trajectory?.summarize(p);
+    $("path-stage").textContent = stageNumber + " / " + KQ.ADAPTIVE_STAGES.length;
+    $("path-fluent").textContent = store.learningSnapshot(p).masteredWords;
+    $("path-checkpoints").textContent = (p.benchmarkRecords || []).length;
+    const messages = {
+      steady: ["A good practice is one you can return to.", "You don't have to be fast today. Let's make the movements comfortable."],
+      curious: ["Which pattern will feel easier today?", "Discover how familiar words become automatic."],
+      challenge: ["Your next challenge is your own previous best.", "Accuracy first. Then see what feels smoother than last time."],
+    };
+    const mode = messages[s.motivation] ? s.motivation : "steady";
+    $("path-headline").textContent = messages[mode][0];
+    $("path-encouragement").textContent = messages[mode][1];
+    $("path-route-sub").textContent = plan.dueCount ? plan.dueCount + " patterns due for review" : "Learn → Use → Remember";
+    $("path-checkpoint-summary").textContent = snapshots?.last
+      ? "Latest: " + snapshots.last.wpm + " WPM at " + snapshots.last.accuracy + "% accuracy on " + snapshots.stageTitle + "."
+      : "Create a baseline with the same real words. Check again after a break to see what stuck.";
+  }
+
   function nextLesson() { return KQ.LESSONS[store.unlockedIndex(state.profile)]; }
   function weakKeys() { return KQ.weakKeys(state.profile.keyStats, store.allowedKeys(state.profile)); }
 
@@ -174,6 +202,7 @@
     $("adaptive-meta").innerHTML =
       `<span>${plan.dueCount} due for review</span><span>${status.masteredWords}/${status.wordGoal} focus words fluent</span><span>${status.ready ? "Ready to progress" : "Mastery first"}</span>`;
     $("btn-continue").onclick = startAdaptivePractice;
+    renderLearningPath(plan);
 
     const weak = weakKeys();
     $("home-weak").hidden = weak.length < 1;
@@ -435,14 +464,36 @@
     if (state.mode === "test") startSpeedTest(); else startExercise();
   });
 
+  function openBenchmark() {
+    state.benchmark = KQ.buildBenchmark(state.profile);
+    $("checkpoint-intro-detail").textContent = state.benchmark.stageTitle + " · " + state.benchmark.words.length + " familiar words · fixed word order";
+    $("checkpoint-word-preview").textContent = state.benchmark.words.join(" · ");
+    show("checkpoint-intro");
+  }
+  function startBenchmark() {
+    state.benchmark = KQ.buildBenchmark(state.profile);
+    state.mode = "benchmark";
+    state.lesson = null;
+    state.exercises = [];
+    state.exIndex = 0;
+    state.exResults = [];
+    $("practice-sub").textContent = "Comparable words · " + state.benchmark.stageTitle;
+    $("practice-title").textContent = "Your word speed checkpoint";
+    $("stat-time-label").textContent = "Time";
+    beginSession(state.benchmark.text);
+  }
+  $("btn-checkpoint").addEventListener("click", openBenchmark);
+  $("btn-progress-checkpoint").addEventListener("click", openBenchmark);
+  $("btn-checkpoint-start").addEventListener("click", startBenchmark);
+
   // ---------- results ----------
   function finishExercise() {
     stopTimer();
     const s = state.session;
     const st = s.stats();
-    store.recordAdaptiveSession(state.profile, s);
+    if (state.mode !== "benchmark") store.recordAdaptiveSession(state.profile, s);
     const activeExercise = state.mode === "test" ? null : state.exercises[state.exIndex];
-    store.recordDrill(state.profile, {
+    if (state.mode !== "benchmark") store.recordDrill(state.profile, {
       mode: state.mode,
       stage: state.mode === "adaptive" ? state.adaptivePlan?.stage?.id : null,
       stageTitle: state.mode === "adaptive" ? state.adaptivePlan?.stage?.title : null,
@@ -460,6 +511,26 @@
     state.keyboard.clearHighlight();
     KQ.highlightFinger($("hands-practice"), null);
 
+    if (state.mode === "benchmark") {
+      const b = state.benchmark;
+      store.recordBenchmark(state.profile, {
+        benchmarkId:b.id,stageId:b.stageId,stageTitle:b.stageTitle,
+        wpm:st.wpm,accuracy:st.accuracy,errors:st.errors,
+        seconds:st.seconds,chars:b.text.length
+      });
+      const summary = KQ.trajectory.summarize(state.profile);
+      showResults({
+        eyebrow:"Word speed checkpoint",title:"A useful measurement ✓",
+        stars:0,stats:st,
+        message:summary.last && summary.last.accuracy >= 95
+          ? "Saved: " + st.wpm + " WPM at " + st.accuracy + "% accuracy. Revisit after a break to see retained speed."
+          : "Saved, but accuracy is below 95%. Focus on smooth, correct movements before comparing speed.",
+        note:"This checkpoint is separate from your spaced-review practice. Speed is not a mastery requirement.",
+        next:{label:"See my trajectory →",action:()=>go("progress")},
+        retry:null,back:{label:"Home",action:()=>go("home")}
+      });
+      return;
+    }
     if (state.mode === "test") {
       store.addHistory(state.profile, { type: "test", label: "Speed test", wpm: st.wpm, acc: st.accuracy, errors: st.errors, seconds: st.seconds });
       store.save();
@@ -779,6 +850,7 @@
     const accs = p.history.filter((h) => h.acc != null);
     const avgAcc = accs.length ? Math.round(accs.reduce((a, h) => a + h.acc, 0) / accs.length) : 0;
     const snap = store.learningSnapshot(p);
+    if (KQ.trajectory) KQ.trajectory.render(p);
     const status = KQ.adaptiveStageStatus(p);
     $("progress-summary").innerHTML = [
       [snap.adaptiveSessions, "Adaptive sessions"], [snap.totalDrills, "Drills stored"], [snap.masteredWords, "Fluent words"],
@@ -836,6 +908,8 @@
     sel.value = level();
     $("set-srs").value = settings().srsMode || "adaptive";
     $("set-theme").value = settings().theme || "dark";
+    $("set-experience").value = s.experience === "path" ? "path" : "classic";
+    $("set-motivation").value = ["steady","curious","challenge"].includes(s.motivation) ? s.motivation : "steady";
     applyFocusMode();
   }
   for (const [k, id] of Object.entries(SETTING_IDS)) {
@@ -847,6 +921,16 @@
     });
   }
   $("set-level").addEventListener("change", (e) => { settings().level = e.target.value; store.save(); });
+  $("set-experience").addEventListener("change", (e) => {
+    settings().experience = e.target.value === "path" ? "path" : "classic";
+    store.save();
+    document.body.classList.toggle("learning-path", settings().experience === "path");
+    // Home remains a single navigation action away, and original mode is preserved.
+  });
+  $("set-motivation").addEventListener("change", (e) => {
+    settings().motivation = ["steady","curious","challenge"].includes(e.target.value) ? e.target.value : "steady";
+    store.save();
+  });
   $("set-theme").addEventListener("change", (e) => {
     settings().theme = e.target.value === "light" ? "light" : "dark";
     store.save();
