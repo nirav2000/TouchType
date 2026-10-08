@@ -108,6 +108,7 @@ function check(name, cond) {
       return selectors.map(selector=>{const el=document.querySelector(selector);if(!el)return {selector,missing:true};const s=getComputedStyle(el);let bg=s.backgroundColor;if(bg==="rgba(0, 0, 0, 0)"||bg==="transparent"){let p=el.parentElement;while(p){const b=getComputedStyle(p).backgroundColor;if(b!=="rgba(0, 0, 0, 0)"&&b!=="transparent"){bg=b;break}p=p.parentElement}}
       return {selector,color:s.color,bg,ratio:ratio(s.color,bg)}});
     });
+    console.log("Contrast diagnostics:",JSON.stringify(contrast));
     check("dark theme metadata and instructional labels meet WCAG AA contrast",contrast.every(x=>!x.missing&&x.ratio>=4.5));
 
     check("progress is compact menu item", await page.$eval("#nav-progress",e=>e.classList.contains("utility-link")));
