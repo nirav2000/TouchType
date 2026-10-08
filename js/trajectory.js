@@ -113,7 +113,7 @@ KQ.trajectory = (() => {
       (forecastPath?'<path d="'+forecastPath+'" fill="none" stroke="#a8a1f6" stroke-width="2.5" stroke-dasharray="7 7"/>':'')+
       '</svg><div class="trajectory-legend"><span><i class="trajectory-dot"></i>Touch WPM</span><span><i class="trajectory-dot adjusted"></i>Accuracy-adjusted touch WPM</span><span><i class="trajectory-dot peck"></i>Peck typing WPM</span>'+(data.forecast.length?'<span><i class="trajectory-dot predicted"></i>Conditional planning guide</span>':'')+'</div>';
     explanation.textContent=!data.calibrated
-      ?"Only "+data.points.length+" distinct touch-typing checkpoint day(s) so far. "+(sameDay?"The chart displays individual attempts on this day; long-term progress uses one daily median. ":"") Four days spanning at least a week are needed before considering a forecast. Keep using the adaptive schedule; test after a break."
+      ?"Only "+data.points.length+" distinct touch-typing checkpoint day(s) so far. "+(sameDay?"The chart displays individual attempts on this day; long-term progress uses one daily median. ":"")+"Four days spanning at least a week are needed before considering a forecast. Keep using the adaptive schedule; test after a break."
       :!data.rising
         ?"Your data do not yet show a stable rising trend. No forecast is shown. Changes in difficulty, fatigue, practice gaps and accuracy can affect speed; keep working on fluent movements."
         :"Dashed line: a capped, diminishing-returns planning estimate based on this stage's daily median checkpoints, assuming continued scheduled practice. It is NOT a validated prediction or confidence interval. Gains may slow, stop or reverse; a new stage resets the benchmark.";
