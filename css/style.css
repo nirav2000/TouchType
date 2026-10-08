@@ -426,6 +426,34 @@ body[data-theme="dark"] .icon-btn,body[data-theme="dark"] .profile-chip{color:va
 body.focus-mode #screen-home.active .home-utility-nav{display:flex}
 body.focus-mode #screen-home.active #nav-settings,body.focus-mode #screen-home.active #nav-progress{display:inline-flex}
 
+/* Accessible semantic surfaces for both themes; no light-only fallback tokens. */
+:root{--surface2:#f3f6f8;--border:#dde4e8;--control-ink:#1e293b}
+body[data-theme="dark"]{
+  --surface2:#25364b;--border:#40546b;--control-ink:#f2f5fc;
+}
+body[data-theme="dark"] .weak-card{
+  background:linear-gradient(135deg,#273447,#302b36);
+  color:var(--ink);
+}
+body[data-theme="dark"] .adaptive-meta span,
+body[data-theme="dark"] .method-flow span:nth-child(odd),
+body[data-theme="dark"] .results-note,
+body[data-theme="dark"] .focus-home-note{
+  background:var(--surface2);
+  color:var(--ink);
+  border-color:var(--border);
+}
+body[data-theme="dark"] .nav-card,
+body[data-theme="dark"] .lesson-card,
+body[data-theme="dark"] .profile-card{
+  color:var(--ink);
+}
+body[data-theme="dark"] .btn:not(.primary):not(.ghost):not(.danger){color:var(--ink)}
+body[data-theme="dark"] .weak-card .btn{color:var(--ink)}
+body[data-theme="dark"] .method-flow b{color:#111827}
+body.learning-path[data-theme="dark"]{--surface2:#203744;--border:#345360;--control-ink:#eaf7f2}
+body.learning-path[data-theme="light"]{--surface2:#e0f0e9;--border:#cadbd5;--control-ink:#183c37}
+
 /* Learning Path is a deliberately different, opt-in learning environment.
    Original TouchType remains unchanged when experience=classic. */
 body.learning-path {
