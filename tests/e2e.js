@@ -101,6 +101,22 @@ function check(name, cond) {
     check("home screen shown", await page.$eval("#screen-home", (e) => e.classList.contains("active")));
     check("adaptive practice is the primary home action", /adaptive practice/i.test(await page.$eval("#home-continue",(e)=>e.innerText)));
     check("five-repeat method is visible", /New word ×5/.test(await page.$eval(".method-card",(e)=>e.innerText)));
+    const focusBefore = await page.$eval("#btn-focus", e => e.getAttribute("aria-pressed"));
+    await page.click("#btn-focus");
+    check("header focus button enables mode", await page.evaluate(() => document.body.classList.contains("focus-mode")));
+    check("header focus button hides extra home panels", await page.$eval("#nav-lessons", e => getComputedStyle(e).display === "none"));
+    check("header focus setting persists", (await profile()).settings.focusMode === true);
+    await page.click("#btn-focus");
+    check("header focus button restores home panels", await page.$eval("#nav-lessons", e => getComputedStyle(e).display !== "none"));
+    check("header focus setting persists when disabled", (await profile()).settings.focusMode === false);
+    const soundBefore = (await profile()).settings.sound;
+    await page.click("#btn-sound");
+    check("header sound button changes stored state", (await profile()).settings.sound === !soundBefore);
+    check("header sound button changes icon", (await page.$eval("#btn-sound",e=>e.textContent)) === (soundBefore ? "🔇" : "🔊"));
+    await page.reload(); await wait(200);
+    check("sound setting survives reload", (await profile()).settings.sound === !soundBefore);
+    await page.click("#btn-sound");
+
     const progressModel = await page.evaluate(() => {
       const p = KQ.store.current();
       KQ.store.recordDrill(p,{mode:"adaptive",stage:"home-gh",exercise:"Test drill",targets:["glass"],wpm:20,accuracy:98,errors:0,seconds:30,latency:400,hesitation:5,timingSamples:20});
