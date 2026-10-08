@@ -276,13 +276,14 @@
     </section>
 
     <!-- Progress -->
-    <section id="screen-progress" class="screen">
+    <section id="screen-progress" class="screen progress-studio">
       <div class="screen-head"><h1>My Progress</h1><button class="btn ghost" data-go="home">← Home</button></div>
       <section class="card trajectory-card" id="trajectory-card" aria-label="Measured and expected typing progress">
         <div class="trajectory-heading"><div><div class="eyebrow">Learning trajectory</div><h2>Your speed, on the same words</h2></div><span id="trajectory-status" class="trajectory-pill">Calibrating</span></div>
         <p class="muted">The checkpoint uses identical words within each stage. A new stage gets its own baseline. Adaptive lessons use different words and cannot be compared directly.</p>
-        <div class="typing-analysis-controls"><div class="analysis-control"><div class="analysis-control-head"><label for="trajectory-min-accuracy">Minimum accuracy filter</label><output id="trajectory-min-label">0%</output></div><input id="trajectory-min-accuracy" type="range" min="0" max="100" step="5" value="0"></div><div class="analysis-control"><div class="analysis-control-head"><label for="trajectory-penalty">Inaccuracy penalty</label><output id="trajectory-penalty-label">1.0×</output></div><input id="trajectory-penalty" type="range" min="0" max="3" step="0.25" value="1"><p class="muted small">0× = no penalty; 1× = proportional accuracy adjustment; higher values penalise errors more strongly.</p></div></div><div id="trajectory-summary" class="trajectory-summary"></div>
+<div id="trajectory-summary" class="trajectory-summary"></div>
         <div id="trajectory-chart" class="trajectory-chart" role="img" aria-label="Speed checkpoint trajectory"></div>
+        <div class="typing-analysis-controls"><div class="analysis-control"><div class="analysis-control-head"><label for="trajectory-min-accuracy">Minimum accuracy filter</label><output id="trajectory-min-label">0%</output></div><input id="trajectory-min-accuracy" type="range" min="0" max="100" step="5" value="0"></div><div class="analysis-control"><div class="analysis-control-head"><label for="trajectory-penalty">Inaccuracy penalty</label><output id="trajectory-penalty-label">1.0×</output></div><input id="trajectory-penalty" type="range" min="0" max="3" step="0.25" value="1"><p class="muted small">0× = no penalty; 1× = proportional accuracy adjustment; higher values penalise errors more strongly.</p></div></div>
         <div class="analysis-results"><div class="analysis-counts"><div><small>Matching checkpoints</small><strong id="trajectory-matches">—</strong></div><div><small>Latest adjusted speed</small><strong id="trajectory-adjusted">—</strong></div></div><div class="analysis-table-wrap"><table class="analysis-table"><thead><tr><th>Checkpoint</th><th>Raw</th><th>Accuracy</th><th>Adjusted</th></tr></thead><tbody id="trajectory-rows"></tbody></table></div></div><p class="muted small" id="trajectory-explanation"></p>
         <div class="trajectory-actions"><button class="btn primary" id="btn-progress-checkpoint">Take a word checkpoint →</button><span class="muted small">100 WPM is an optional long-term ambition, not a five-week promise.</span></div>
       </section>
