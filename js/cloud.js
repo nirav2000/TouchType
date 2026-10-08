@@ -31,6 +31,7 @@ async function sync(){if(busy||!auth.currentUser||auth.currentUser.uid!==OWNER){
  KQ.store.acceptCloudData(merged);
  await setDoc(ref,{app:'touchtype',schemaVersion:1,updatedAt:serverTimestamp(),profiles:merged.profiles,currentId:merged.currentId});
  for(const profile of merged.profiles){
+  if(auth.currentUser?.uid!==accountAtStart)return;
   const access=membershipDoc(OWNER,profile);
   await setDoc(access,{uid:OWNER,learnerId:learnerId(profile),role:'parent',createdAt:serverTimestamp()},{merge:true});
   await setDoc(learnerDoc(profile),{learnerId:learnerId(profile),ownerUid:OWNER,profile,updatedAt:serverTimestamp()},{merge:true});
