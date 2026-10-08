@@ -122,6 +122,24 @@ function check(name, cond) {
     check("checkpoint text matches fixed words", checkpointText === await text());
     await typeEx(0);
     check("checkpoint is recorded separately", (await profile()).benchmarkRecords.length===1);
+    const calibration = await page.evaluate(()=>{
+      const p=structuredClone(KQ.store.current());
+      const id=KQ.buildBenchmark(p).id;
+      const now=Date.now();
+      p.benchmarkRecords=[0,3,6].map((d,i)=>({benchmarkId:id,stageId:KQ.adaptiveStageFor(p).id,date:new Date(now-(10-d)*86400000).toISOString(),wpm:20+i*2,accuracy:98}));
+      const insufficient=KQ.trajectory.summarize(p);
+      p.benchmarkRecords.push({benchmarkId:id,stageId:KQ.adaptiveStageFor(p).id,date:new Date(now).toISOString(),wpm:27,accuracy:98});
+      const sufficient=KQ.trajectory.summarize(p);
+      p.benchmarkRecords.push({benchmarkId:id,stageId:KQ.adaptiveStageFor(p).id,date:new Date(now).toISOString(),wpm:99,accuracy:80});
+      const excludesLowAccuracy=KQ.trajectory.summarize(p);
+      return {notReady:!insufficient.calibrated && !insufficient.forecast.length,
+        ready:sufficient.calibrated && sufficient.forecast.length===5,
+        excluded:excludesLowAccuracy.last.wpm===sufficient.last.wpm};
+    });
+    check("forecast withheld without four distinct accurate days", calibration.notReady);
+    check("forecast appears only with measured rising trend", calibration.ready);
+    check("low-accuracy retries do not inflate speed curve", calibration.excluded);
+
     check("checkpoint does not count as adaptive drill", !(await profile()).drillRecords.some(d=>d.mode==="benchmark"));
     await page.click("#btn-results-next");
     check("trajectory displays recorded checkpoint", /checkpoint/i.test(await page.$eval("#trajectory-card",e=>e.innerText)));
