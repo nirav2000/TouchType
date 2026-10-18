@@ -1,0 +1,56 @@
+{
+  "checkpointId": "vl-20261018T135705Z-40dc7a4e",
+  "appId": "touchtype",
+  "productVersion": "0.7.0",
+  "commit": "40dc7a4ed64ed662c0d49c037d700c06aecd00ee",
+  "sourceRef": null,
+  "createdAt": "2026-10-18T13:57:05.290Z",
+  "title": "TouchType Studio",
+  "summary": "Verified responsive Studio dashboard with personalised learning milestones and retained learner data.",
+  "areas": [
+    {
+      "id": "learning-journey",
+      "title": "Learning journey",
+      "kind": "feature",
+      "summary": "Personalised Studio dashboard"
+    },
+    {
+      "id": "visual-design",
+      "title": "Visual design",
+      "kind": "ui",
+      "summary": "Responsive visual refresh"
+    },
+    {
+      "id": "quality",
+      "title": "Quality",
+      "kind": "test",
+      "summary": "Verified browser journeys"
+    }
+  ],
+  "sourceUrl": "https://github.com/nirav2000/TouchType/tree/40dc7a4ed64ed662c0d49c037d700c06aecd00ee",
+  "snapshotUrl": "./snapshots/vl-20261018T135705Z-40dc7a4e/index.html",
+  "snapshotSafety": "visual-only",
+  "compatibility": {
+    "frontend": "archived",
+    "source": "git",
+    "snapshot": "generated",
+    "backend": "live backend connections blocked",
+    "data": "contract recorded"
+  },
+  "data": {
+    "provider": "localStorage",
+    "schemaVersion": "1",
+    "paths": [
+      "touchtype:v1"
+    ]
+  },
+  "readOnlyAdapter": null,
+  "platform": {
+    "contract": "v1"
+  },
+  "generator": {
+    "name": "Apps Version Lab",
+    "contractVersion": 1,
+    "backfilled": false
+  }
+}

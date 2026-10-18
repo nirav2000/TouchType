@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob: https:; connect-src 'none'; form-action 'none'; frame-ancestors *; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; media-src 'self' data: blob: https:;">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TouchType — Learn to Type</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%8C%A8%EF%B8%8F%3C/text%3E%3C/svg%3E">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#101827">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-theme="dark">
+<div id="app">
+  <header class="topbar">
+    <button class="brand" id="btn-home" title="Home">⌨️ <span>TouchType</span></button>
+    <div class="topbar-right">
+      <button id="btn-focus" class="icon-btn focus-toggle" title="Focus mode" aria-label="Turn on Focus mode" aria-pressed="false"><span aria-hidden="true">◎</span><span id="focus-button-label">Focus</span></button>
+      <button id="btn-sound" class="icon-btn" title="Sound on/off">🔊</button>
+      <button id="btn-profile" class="profile-chip" title="Switch typist"><span id="chip-avatar"></span><span id="chip-name"></span></button>
+    </div>
+  </header>
+
+  <div id="capslock" class="capslock" hidden>🔒 Caps Lock is on! Press it once to turn it off.</div>
+  <main id="screens">
+
+    <!-- Profiles -->
+    <section id="screen-profiles" class="screen"><div class="marketing-hero"><div class="marketing-copy"><span class="marketing-pill">● For beginners and improving typists</span><h1>Type with <em>confidence.</em><br>Build real <em>speed.</em></h1><p>Learn to touch type with personalised practice that spots your tricky keys, helps you remember real words and shows how far you've come.</p><div class="marketing-actions"><button class="marketing-cta" id="marketing-start" type="button">Get started →</button><span>No account required to begin</span></div></div><div class="marketing-art" aria-hidden="true"><div class="art-orbit art-orbit-one"></div><div class="art-orbit art-orbit-two"></div><div class="art-keys"><span>F</span><span>J</span><span>↗</span></div><div class="art-caption">Find your rhythm.</div></div></div><div class="marketing-benefits"><div><span>01</span><strong>Start at your level</strong><p>From first finger positions to fluent sentences.</p></div><div><span>02</span><strong>Practise what matters</strong><p>Exercises adapt to mistakes and hesitation.</p></div><div><span>03</span><strong>See genuine progress</strong><p>Track speed and accuracy with repeatable checkpoints.</p></div></div><div id="profile-entry" class="profile-entry">
+      <h1 class="big-title">Who's typing today?</h1>
+      <div id="profile-list" class="profile-list"></div>
+      <div class="card new-profile">
+        <h2>New typist</h2>
+        <div class="avatar-picker" id="avatar-picker"></div>
+        <div class="eyebrow">How old are you?</div>
+        <div class="level-picker" id="level-picker"></div>
+        <div class="row">
+          <input id="new-name" type="text" maxlength="20" placeholder="Your name" autocomplete="off">
+          <button id="btn-create" class="btn primary">Let's go!</button>
+        </div>
+      </div>
+      </div>
+    </section>
+
+    <!-- Home -->
+    <section id="screen-home" class="screen">
+      <div class="studio-intro"><div class="studio-intro-copy"><span class="studio-kicker">YOUR PERSONAL TYPING JOURNEY</span><h1 class="big-title">Every keystroke <em>counts.</em></h1><p class="studio-lead" id="home-greeting">Welcome back!</p><p class="studio-description">Build confident hands with a short, personalised session. Your next step is ready.</p><button class="studio-main-cta" id="studio-start" type="button">Continue my journey →</button></div><div class="studio-intro-art" aria-hidden="true"><div class="studio-key-row"><span>A</span><span>S</span><span>D</span><span>F</span></div><div class="studio-key-row second"><span>J</span><span>K</span><span>L</span><span>;</span></div><span class="studio-art-note">PRACTICE MAKES PROGRESS</span></div></div>
+      <section class="studio-dashboard" aria-label="Your learning dashboard">
+        <div class="studio-goal"><span class="studio-label">YOUR NEXT MILESTONE</span><strong id="studio-goal-title">Building your foundation</strong><p id="studio-goal-detail">Every accurate repetition counts.</p><div class="studio-meter" role="progressbar" aria-label="Current stage progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="studio-meter"><span id="studio-meter-fill"></span></div><span class="studio-footnote" id="studio-goal-footnote">Your journey starts here</span></div>
+        <div class="studio-insights"><span class="studio-label">AT A GLANCE</span><div class="studio-insight-grid"><div><strong id="studio-sessions">0</strong><span>Sessions</span></div><div><strong id="studio-fluent">0</strong><span>Fluent words</span></div><div><strong id="studio-due">0</strong><span>To review</span></div></div><button id="studio-progress" class="studio-progress-link" type="button">Explore your progress ↗</button></div>
+      </section>
+      <div id="focus-home-note" class="focus-home-note" hidden><span>◎ Focus mode</span><strong>Today's practice only</strong><span class="muted">Extra activities are tucked away. Progress and Settings stay available.</span></div>
+      <section id="path-home" class="path-home" hidden aria-label="Your learning journey">
+        <div class="path-hero">
+          <div class="path-hero-copy">
+            <div class="path-eyebrow">YOUR LEARNING PATH · ONE STEP AT A TIME</div>
+            <h2 id="path-headline">Build the habit. Watch it grow.</h2>
+            <p id="path-encouragement" class="path-support">Every accurate movement makes the next one easier.</p>
+            <div class="path-hero-metrics">
+              <div><strong id="path-stage">Stage 1 of 10</strong><span>Current skill</span></div>
+              <div><strong id="path-fluent">0</strong><span>Fluent words</span></div>
+              <div><strong id="path-checkpoints">0</strong><span>Checkpoints</span></div>
+            </div>
+          </div>
+          <div class="path-motif" aria-hidden="true"><div class="path-ring"><span>F</span><span>J</span></div><span class="path-motif-caption">Small moves.<br>Strong patterns.</span></div>
+        </div>
+        <div class="path-route">
+          <div class="path-route-top"><strong>Today's route</strong><span id="path-route-sub">Learn → Use → Remember</span></div>
+          <div class="path-route-steps"><span><b>01</b> Build</span><span><b>02</b> Use in sentences</span><span><b>03</b> Recall</span><span><b>04</b> Check progress</span></div>
+        </div>
+      </section>
+      <div class="card continue-card adaptive-card" id="home-continue">
+        <div>
+          <div class="eyebrow">Today's adaptive practice</div>
+          <div class="continue-title" id="continue-title"></div>
+          <div class="muted" id="continue-sub"></div>
+          <div class="adaptive-meta" id="adaptive-meta"></div>
+        </div>
+        <button id="btn-continue" class="btn primary big">Start today's practice ▶</button>
+      </div>
+      <div class="card method-card">
+        <div class="eyebrow">How TouchType learns with you</div>
+        <div class="method-flow">
+          <span><b>1</b> New word ×5</span><span>→</span>
+          <span><b>2</b> Real sentence</span><span>→</span>
+          <span><b>3</b> Mixed recall</span><span>→</span>
+          <span><b>4</b> Review when due</span>
+        </div>
+        <p class="muted small">Correct but hesitant is not mastery. TouchType tracks accuracy, pauses and word fluency, then brings weak or due patterns back more often.</p>
+      </div>
+      <div class="card weak-card" id="home-weak" hidden>
+        <div>
+          <div class="eyebrow">Tricky keys</div>
+          <div class="continue-title">Let's practice <span id="weak-keys"></span></div>
+          <div class="muted">A short workout on the keys you miss most.</div>
+        </div>
+        <button id="btn-weak" class="btn primary">Practice ▶</button>
+      </div>
+      <div class="nav-grid">
+        <button class="nav-card" id="nav-lessons"><span class="nav-icon">📚</span><span>Extra lessons</span></button>
+        <button class="nav-card" id="nav-games"><span class="nav-icon">🎮</span><span>Games</span></button>
+        <button class="nav-card" id="nav-test"><span class="nav-icon">⏱️</span><span>Speed Test</span></button>
+        
+        <button class="nav-card" id="nav-analytics"><span class="nav-icon">📈</span><span>Analytics</span></button>
+        
+      </div>
+      <section id="path-checkpoint-card" class="card path-checkpoint-card" hidden>
+        <div><div class="eyebrow">Consistent speed measurement</div><h2>Your word checkpoint</h2><p class="muted" id="path-checkpoint-summary">Repeat the same familiar words to see genuine progress.</p></div>
+        <button id="btn-checkpoint" class="btn">Check my word speed →</button>
+      </section>
+      <nav class="home-utility-nav" aria-label="Learning tools">
+        <button id="nav-progress" class="utility-link"><span aria-hidden="true">↗</span> My Progress</button>
+        <button id="nav-settings" class="utility-link"><span aria-hidden="true">⚙</span> Settings</button>
+      </nav>
+    </section>
+
+    <!-- Lessons -->
+    <section id="screen-lessons" class="screen">
+      <div class="screen-head"><h1>Lessons</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <div id="lesson-grid" class="lesson-grid"></div>
+    </section>
+
+    <!-- Lesson intro -->
+    <section id="screen-intro" class="screen">
+      <div class="card intro-card">
+        <div class="eyebrow" id="intro-number"></div>
+        <h1 id="intro-title"></h1>
+        <div id="intro-keys" class="intro-keys"></div>
+        <p id="intro-tip" class="intro-tip"></p>
+        <ul id="intro-checklist" class="intro-checklist" hidden></ul>
+        <div id="intro-fingers" class="intro-fingers"></div>
+        <div id="intro-hands" class="intro-hands"></div>
+        <div class="row center">
+          <button class="btn ghost" data-go="lessons">← Back</button>
+          <button id="btn-start-lesson" class="btn primary big">Start ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Practice -->
+    <section id="screen-practice" class="screen">
+      <div class="practice-head">
+        <div>
+          <div class="eyebrow" id="practice-sub"></div>
+          <h2 id="practice-title"></h2>
+        </div>
+        <div class="stats">
+          <div class="stat"><span class="stat-val" id="stat-wpm">0</span><span class="stat-label">WPM</span></div>
+          <div class="stat"><span class="stat-val" id="stat-acc">100%</span><span class="stat-label">Accuracy</span></div>
+          <div class="stat"><span class="stat-val" id="stat-time">0:00</span><span class="stat-label" id="stat-time-label">Time</span></div>
+        </div>
+      </div>
+      <div class="progress-bar"><div id="practice-progress" class="progress-fill"></div></div>
+      <div id="text-display" class="text-display" tabindex="0"></div>
+      <div id="hint-line" class="hint-line"></div>
+      <div class="kb-area">
+        <div id="kb-practice"></div>
+        <div id="hands-practice" class="hands-wrap"></div>
+      </div>
+      <div class="row center practice-actions">
+        <button id="btn-restart" class="btn ghost">↻ Restart</button>
+        <button id="btn-quit" class="btn ghost">✕ Quit</button>
+      </div>
+    </section>
+
+    <!-- Results -->
+    <section id="screen-results" class="screen">
+      <div class="card results-card">
+        <div class="eyebrow" id="results-eyebrow"></div>
+        <h1 id="results-title"></h1>
+        <div id="results-stars" class="stars"></div>
+        <div class="results-grid">
+          <div class="stat"><span class="stat-val" id="results-wpm">0</span><span class="stat-label">WPM</span></div>
+          <div class="stat"><span class="stat-val" id="results-acc">0%</span><span class="stat-label">Accuracy</span></div>
+          <div class="stat"><span class="stat-val" id="results-errors">0</span><span class="stat-label">Mistakes</span></div>
+          <div class="stat"><span class="stat-val" id="results-time">0s</span><span class="stat-label">Time</span></div>
+        </div>
+        <p id="results-message" class="results-message"></p><div id="results-note" class="results-note" hidden></div>
+        <div class="row center">
+          <button id="btn-results-back" class="btn ghost">Lessons</button>
+          <button id="btn-results-retry" class="btn ghost">↻ Try again</button>
+          <button id="btn-results-next" class="btn primary big">Next ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Games -->
+    <section id="screen-games" class="screen">
+      <div class="screen-head"><h1>Games</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <div class="card game-card">
+        <div class="game-icon">🌧️</div>
+        <div class="game-info">
+          <h2>Letter Rain</h2>
+          <p>Words fall from the sky. Type them before they hit the ground! Best score: <strong id="rain-best">0</strong></p>
+          <div class="row wrap">
+            <button class="btn primary" data-rain="home">Home row</button>
+            <button class="btn primary" data-rain="letters">All letters</button>
+            <button class="btn primary" data-rain="all">Everything</button>
+          </div>
+        </div>
+      </div>
+      <div class="card game-card">
+        <div class="game-icon">🚀</div>
+        <div class="game-info">
+          <h2>Rocket Race</h2>
+          <p>Type the passage to beat Robo's rocket to the finish line. Best speed: <strong id="race-best">0</strong> WPM</p>
+          <div class="row wrap">
+            <button class="btn primary" data-race="slow">Slow Robo (10 WPM)</button>
+            <button class="btn primary" data-race="medium">Medium Robo (20 WPM)</button>
+            <button class="btn primary" data-race="fast">Fast Robo (35 WPM)</button>
+          </div>
+        </div>
+      </div>
+      <div class="card game-card">
+        <div class="game-icon">🫧</div>
+        <div class="game-info">
+          <h2>Bubble Pop</h2>
+          <p>Letters float up in bubbles. Press the right key to pop them before they escape! Best score: <strong id="bubbles-best">0</strong></p>
+          <div class="row wrap">
+            <button class="btn primary" data-bubbles="home">Home row</button>
+            <button class="btn primary" data-bubbles="letters">All letters</button>
+            <button class="btn primary" data-bubbles="all">Capitals &amp; numbers</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Letter Rain -->
+    <section id="screen-rain" class="screen">
+      <div class="rain-hud">
+        <div class="stat"><span class="stat-val" id="rain-score">0</span><span class="stat-label">Score</span></div>
+        <div class="stat"><span class="stat-val" id="rain-level">1</span><span class="stat-label">Level</span></div>
+        <div class="stat"><span class="stat-val" id="rain-lives">❤️❤️❤️❤️❤️</span><span class="stat-label">Lives</span></div>
+        <button id="btn-rain-quit" class="btn ghost">✕ Quit</button>
+      </div>
+      <div id="rain-area" class="rain-area">
+        <div id="rain-overlay" class="rain-overlay">
+          <h2 id="rain-overlay-title">Letter Rain</h2>
+          <p id="rain-overlay-text">Type the falling words. Press any key to start!</p>
+          <button id="btn-rain-start" class="btn primary big">Play ▶</button>
+        </div>
+        <div class="rain-ground"></div>
+      </div>
+    </section>
+
+    <!-- Rocket Race -->
+    <section id="screen-race" class="screen">
+      <div class="rain-hud">
+        <div class="stat"><span class="stat-val" id="race-wpm">0</span><span class="stat-label">WPM</span></div>
+        <div class="stat"><span class="stat-val" id="race-robo-wpm">0</span><span class="stat-label">Robo WPM</span></div>
+        <button id="btn-race-quit" class="btn ghost">✕ Quit</button>
+      </div>
+      <div class="race-track card">
+        <div class="race-lane"><span class="race-label">You</span><div class="race-bar"><span id="race-player" class="race-rocket">🚀</span></div><span class="race-flag">🏁</span></div>
+        <div class="race-lane"><span class="race-label">Robo</span><div class="race-bar"><span id="race-robo" class="race-rocket">🛸</span></div><span class="race-flag">🏁</span></div>
+        <div id="race-countdown" class="race-countdown"></div>
+      </div>
+      <div class="race-text-wrap">
+        <div id="race-text" class="text-display small"></div>
+        <div id="race-overlay" class="rain-overlay">
+          <h2 id="race-overlay-title">Rocket Race</h2>
+          <p id="race-overlay-text">Type the passage faster than Robo to win. Press Play or any key to start!</p>
+          <button id="btn-race-start" class="btn primary big">Play ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bubble Pop -->
+    <section id="screen-bubbles" class="screen">
+      <div class="rain-hud">
+        <div class="stat"><span class="stat-val" id="bubbles-score">0</span><span class="stat-label">Score</span></div>
+        <div class="stat"><span class="stat-val" id="bubbles-level">1</span><span class="stat-label">Level</span></div>
+        <div class="stat"><span class="stat-val" id="bubbles-lives">❤️❤️❤️❤️❤️</span><span class="stat-label">Lives</span></div>
+        <button id="btn-bubbles-quit" class="btn ghost">✕ Quit</button>
+      </div>
+      <div id="bubbles-area" class="rain-area bubbles-area">
+        <div id="bubbles-overlay" class="rain-overlay">
+          <h2 id="bubbles-overlay-title">Bubble Pop</h2>
+          <p id="bubbles-overlay-text">Press the letter in each bubble before it floats away. Press Play or any key to start!</p>
+          <button id="btn-bubbles-start" class="btn primary big">Play ▶</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Progress -->
+    <section id="screen-progress" class="screen progress-studio">
+      <div class="screen-head"><h1>My Progress</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <section class="card trajectory-card" id="trajectory-card" aria-label="Measured and expected typing progress">
+        <div class="trajectory-heading"><div><div class="eyebrow">Learning trajectory</div><h2>Your speed, on the same words</h2></div><span id="trajectory-status" class="trajectory-pill">Calibrating</span></div>
+        <p class="muted">The checkpoint uses identical words within each stage. A new stage gets its own baseline. Adaptive lessons use different words and cannot be compared directly.</p>
+<div id="trajectory-summary" class="trajectory-summary"></div>
+        <div id="trajectory-chart" class="trajectory-chart" role="img" aria-label="Speed checkpoint trajectory"></div>
+        <div class="typing-analysis-controls"><div class="analysis-control"><div class="analysis-control-head"><label for="trajectory-min-accuracy">Minimum accuracy filter</label><output id="trajectory-min-label">0%</output></div><input id="trajectory-min-accuracy" type="range" min="0" max="100" step="1" value="0"></div><div class="analysis-control"><div class="analysis-control-head"><label for="trajectory-penalty">Inaccuracy penalty</label><output id="trajectory-penalty-label">1.0×</output></div><input id="trajectory-penalty" type="range" min="0" max="3" step="0.25" value="1"><p class="muted small">0× = no penalty; 1× = proportional accuracy adjustment; higher values penalise errors more strongly.</p></div></div>
+        <div class="analysis-results"><div class="analysis-counts"><div><small>Matching checkpoints</small><strong id="trajectory-matches">—</strong></div><div><small>Latest adjusted speed</small><strong id="trajectory-adjusted">—</strong></div></div><div class="analysis-table-wrap"><table class="analysis-table"><thead><tr><th>Checkpoint</th><th>Raw</th><th>Accuracy</th><th>Adjusted</th></tr></thead><tbody id="trajectory-rows"></tbody></table></div></div><p class="muted small" id="trajectory-explanation"></p>
+        <div class="trajectory-actions"><button class="btn primary" id="btn-progress-checkpoint">Take a word checkpoint →</button><span class="muted small">100 WPM is an optional long-term ambition, not a five-week promise.</span></div>
+      </section>
+      <div class="results-grid card" id="progress-summary"></div>
+      <div class="progress-two">
+        <div class="card">
+          <div class="eyebrow">Current learning stage</div>
+          <h2 id="progress-stage-title"></h2>
+          <div id="progress-stage-detail" class="progress-detail"></div>
+        </div>
+        <div class="card">
+          <div class="eyebrow">Coming back</div>
+          <h2>Review forecast</h2>
+          <div id="progress-review-forecast" class="progress-detail"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row between wrap"><div><h2>Adaptive drills completed</h2><p class="muted">Every drill is kept so you can see whether accuracy, hesitation and fluency are actually improving.</p></div></div>
+        <div class="table-wrap"><table id="progress-drills"></table></div>
+      </div>
+      <div class="card">
+        <h2>Key accuracy</h2>
+        <p class="muted">Green keys are your friends. Red keys need some practice.</p>
+        <div id="kb-heat"></div>
+        <div class="heat-legend"><span class="heat-good">95%+</span><span class="heat-ok">85–94%</span><span class="heat-bad">below 85%</span><span class="heat-none">not yet</span></div>
+      </div>
+      <div class="card">
+        <h2>Lessons</h2>
+        <div class="table-wrap"><table id="progress-lessons"></table></div>
+      </div>
+      <div class="card">
+        <h2>Recent activity</h2>
+        <p class="muted">A longer-term record of lessons, tests, adaptive practice and games.</p>
+        <div class="table-wrap"><table id="progress-history"></table></div>
+      </div>
+    </section>
+
+    <!-- Analytics -->
+    <section id="screen-analytics" class="screen">
+      <div class="screen-head analytics-head">
+        <div><div class="eyebrow">Parent / detailed view</div><h1>Typing Analytics</h1><p class="muted" id="analytics-caption"></p></div>
+        <div class="row wrap"><select id="analytics-range"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option><option value="all">All time</option></select><button class="btn ghost" data-go="home">← Home</button></div>
+      </div>
+      <div class="results-grid card analytics-summary" id="analytics-summary"></div>
+      <div class="analytics-grid">
+        <div class="card chart-card"><div class="eyebrow">Fluency</div><h2>Typing speed over time</h2><p class="muted small">Useful once drills contain meaningful words and sentences; early restricted-key WPM is retained but should not be treated as the main mastery signal.</p><div id="chart-speed" class="chart-host"></div></div>
+        <div class="card chart-card"><div class="eyebrow">Automaticity</div><h2>Accuracy vs hesitation</h2><p class="muted small">The ideal direction is high accuracy with falling hesitation. This is more informative than WPM alone for early motor learning.</p><div id="chart-quality" class="chart-host"></div></div>
+      </div>
+      <div class="card chart-card"><div class="eyebrow">Keyboard diagnostic</div><h2>Accuracy by key</h2><p class="muted small">Hover/tap bars for values. The table below separates accuracy from latency and hesitation so a correct-but-slow key remains visible.</p><div id="chart-keys" class="chart-host wide"></div><div class="table-wrap"><table id="analytics-keys-table"></table></div></div>
+      <div class="card"><div class="eyebrow">Adaptive SRS</div><h2>Word mastery & review state</h2><p class="muted">Retention and stability are the scheduler's current estimates; “Due now” means TouchType is likely to surface that motor pattern again.</p><div class="table-wrap"><table id="analytics-words-table"></table></div></div>
+    </section>
+
+    <!-- Comparable speed checkpoint -->
+    <section id="screen-checkpoint-intro" class="screen">
+      <div class="screen-head"><h1>Word speed checkpoint</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <div class="card checkpoint-intro">
+        <div class="eyebrow">Measurement, not a lesson</div>
+        <h2>Same words. Same order. A fairer comparison.</h2>
+        <p id="checkpoint-intro-detail"></p>
+        <p class="muted">Type accurately at a comfortable pace. Your result is saved separately from learning drills and won't advance the review scheduler. Use it occasionally, ideally after a break—not repeatedly to chase a score.</p>
+        <label class="toggle"><span>Typing method <small>Use the same words to compare your usual peck typing with touch typing.</small></span><select id="checkpoint-method"><option value="touch">Touch typing</option><option value="peck">Peck typing (usual method)</option></select></label>
+        <div class="checkpoint-words" id="checkpoint-word-preview"></div>
+        <div class="row wrap"><button id="btn-checkpoint-start" class="btn primary big">Start checkpoint →</button><button class="btn ghost" data-go="progress">View trajectory</button></div>
+      </div>
+    </section>
+
+    <!-- Settings -->
+    <section id="screen-settings" class="screen">
+      <div class="screen-head"><h1>Settings</h1><button class="btn ghost" data-go="home">← Home</button></div>
+      <div class="card">
+        <label class="toggle"><span>Skill level <small>Changes speed targets, exercise length and game speed.</small></span>
+          <select id="set-level"></select></label>
+        <label class="toggle"><input type="checkbox" id="set-sound"><span>Sound effects</span></label>
+        <label class="toggle"><input type="checkbox" id="set-stop"><span>Wait for the right key after a mistake <small>(off: keep going, fix with Backspace)</small></span></label>
+        <label class="toggle"><input type="checkbox" id="set-keyboard"><span>Show on-screen keyboard</span></label>
+        <label class="toggle"><input type="checkbox" id="set-hands"><span>Show hands</span></label>
+        <label class="toggle"><input type="checkbox" id="set-focus"><span>Simplify Home <small>Hide games, tests and extra panels. Typing keeps its normal aids unless Focus is turned on separately while typing.</small></span></label>
+        <label class="toggle"><span>Appearance <small>Dark is the default. Switch to light at any time.</small></span><select id="set-theme"><option value="dark">Dark</option><option value="light">Light</option></select></label>
+        <label class="toggle"><span>Home design <small>Switch between the existing layout and the learning-first journey. Your progress is shared between both.</small></span><select id="set-experience"><option value="classic">Original TouchType</option><option value="path">Learning Path · Studio + Journey</option></select></label>
+        <label class="toggle"><span>Motivation style <small>Choose what helps this learner feel engaged. No public leaderboards or pressure.</small></span><select id="set-motivation"><option value="steady">Reassurance · one step at a time</option><option value="curious">Curiosity · explore new patterns</option><option value="challenge">Personal challenge · beat your own baseline</option></select></label>
+        <label class="toggle"><span>Spaced review system <small>Adaptive uses delayed retention, accuracy and fluency to choose the next interval. Classic uses the original fixed ladder.</small></span>
+          <select id="set-srs"><option value="adaptive">Adaptive motor SRS</option><option value="ladder">Classic 1 · 3 · 7 · 14 · 30 days</option></select></label>
+        <label class="toggle"><input type="checkbox" id="set-unlock"><span>Unlock all lessons <small>(for grown-ups; normally a lesson needs 2 stars to unlock the next)</small></span></label>
+      </div>
+      <div class="card">
+        <h2>About</h2>
+        <p>TouchType <strong id="settings-version">v…</strong></p>
+        <p class="muted" id="settings-version-name"></p>
+      </div>
+      <div class="card">
+        <h2>Backup</h2>
+        <p class="muted">Progress is saved in this browser only. Export a backup to move it to another computer.</p>
+        <div class="row wrap">
+          <button id="btn-export" class="btn">⬇ Export progress</button>
+          <button id="btn-import" class="btn">⬆ Import progress</button>
+          <input type="file" id="import-file" accept="application/json" hidden>
+        </div>
+      </div>
+      <div class="card danger-zone">
+        <h2>Danger zone</h2>
+        <div class="row wrap">
+          <button id="btn-delete-profile" class="btn danger">Delete this typist</button>
+          <button id="btn-reset-all" class="btn danger">Erase everything</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+  <footer class="footer">TouchType <span id="app-version">v…</span> · free and open source · Made with ❤️ for kids learning to type.</footer>
+</div>
+
+<script>
+  if (!["localhost","127.0.0.1"].includes(location.hostname)) {
+    const platform = document.createElement("script");
+    platform.src = "https://nirav2000.github.io/Apps/platform/v1/loader.js";
+    platform.dataset.appManifest = "./apps-manifest.json";
+    document.head.appendChild(platform);
+  }
+</script>
+<script src="js/data/words.js"></script>
+<script src="js/data/lessons.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/keyboard.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/storage.js"></script>
+<script type="module" src="js/cloud.js"></script>
+<script src="js/game.js"></script>
+<script src="js/race.js"></script>
+<script src="js/bubbles.js"></script>
+<script src="js/analytics.js"></script>
+<script src="js/trajectory.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
