@@ -99,6 +99,9 @@ function check(name, cond) {
     await page.fill("#new-name", "Ada"); await page.click("#btn-create"); await wait(200);
     check("profile created with little-kid level", (await profile()).settings.level === "little");
     check("home screen shown", await page.$eval("#screen-home", (e) => e.classList.contains("active")));
+    check("learner hero presents a clear benefit", await page.$eval(".studio-intro h1",e=>/Every keystroke/.test(e.textContent)));
+    check("primary hero action starts adaptive practice", await page.$eval("#studio-start",e=>e.tagName==="BUTTON"));
+    check("public onboarding has a meaningful headline", await page.$eval(".marketing-copy h1",e=>/confidence/.test(e.textContent)));
     check("dark mode is default", await page.$eval("body",e=>e.dataset.theme==="dark"));
     check("Studio milestone uses actual adaptive stage", await page.$eval("#studio-goal-title",e=>e.textContent.trim().length>0));
     check("Studio progress meter is valid", await page.$eval("#studio-meter",e=>Number(e.getAttribute("aria-valuenow"))>=0 && Number(e.getAttribute("aria-valuenow"))<=100));
