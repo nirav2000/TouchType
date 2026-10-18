@@ -203,6 +203,16 @@
       `<span>${plan.dueCount} due for review</span><span>${status.masteredWords}/${status.wordGoal} focus words fluent</span><span>${status.ready ? "Ready to progress" : "Mastery first"}</span>`;
     $("btn-continue").onclick = startAdaptivePractice;
     renderLearningPath(plan);
+    const progress = Math.max(0, Math.min(100, Math.round(100 * status.masteredWords / Math.max(1,status.wordGoal))));
+    $("studio-goal-title").textContent = plan.stage.title;
+    $("studio-goal-detail").textContent = status.ready ? "This stage is ready. Keep practising to make it stick." : "Master " + Math.max(0,status.wordGoal-status.masteredWords) + " more focus words to complete this stage.";
+    $("studio-meter").setAttribute("aria-valuenow",String(progress));
+    $("studio-meter-fill").style.width = progress+"%";
+    $("studio-goal-footnote").textContent = status.masteredWords+" of "+status.wordGoal+" focus words fluent · "+progress+"% complete";
+    const snapshot=store.learningSnapshot(p);
+    $("studio-sessions").textContent=String(snapshot.adaptiveSessions);
+    $("studio-fluent").textContent=String(snapshot.masteredWords);
+    $("studio-due").textContent=String(snapshot.dueNow);
 
     const weak = weakKeys();
     $("home-weak").hidden = weak.length < 1;
@@ -214,6 +224,7 @@
   $("nav-lessons").addEventListener("click", () => go("lessons"));
   $("nav-games").addEventListener("click", () => go("games"));
   $("nav-progress").addEventListener("click", () => go("progress"));
+  $("studio-progress").addEventListener("click", () => go("progress"));
   $("nav-analytics").addEventListener("click", () => go("analytics"));
   $("nav-settings").addEventListener("click", () => go("settings"));
   $("nav-test").addEventListener("click", startSpeedTest);
