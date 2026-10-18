@@ -682,3 +682,40 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #94bc
  #screen-results .results-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(prefers-reduced-motion:reduce){#screen-home .nav-card,#screen-home .utility-link{transition:none}#screen-home .nav-card:hover{transform:none}}
+
+/* TouchType Studio — outcome-led learning dashboard, designed for mobile and desktop. */
+body[data-theme="dark"]{background:#080e18 radial-gradient(ellipse 80% 55% at 45% -20%,#1d3551 0%,transparent 78%) fixed}
+#screen-home{max-width:1120px;margin:0 auto}
+.studio-intro{padding:28px 0 22px}
+.studio-kicker,.studio-label{display:block;font-size:.72rem;letter-spacing:.16em;font-weight:850;color:#86b6ff}
+.studio-intro .big-title{margin:10px 0;font-size:clamp(2.2rem,5vw,3.8rem);letter-spacing:-.065em;line-height:1.06}
+.studio-lead{max-width:590px;color:var(--muted);font-size:1.04rem;line-height:1.6}
+.studio-dashboard{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(240px,1fr);gap:16px;margin:0 0 18px}
+.studio-goal,.studio-insights{padding:28px;border:1px solid #34445d;border-radius:24px;background:linear-gradient(145deg,#1b2b42,#111c2c);box-shadow:0 18px 48px #0003;min-width:0}
+.studio-goal>strong{display:block;font-size:clamp(1.5rem,2.5vw,2.15rem);letter-spacing:-.045em;line-height:1.2;margin:16px 0 10px;color:#f7f9ff}
+.studio-goal p{color:#b4c2d5;margin-bottom:26px}
+.studio-meter{height:11px;background:#34445d;border-radius:100px;overflow:hidden}
+.studio-meter>span{display:block;width:0;height:100%;border-radius:100px;background:linear-gradient(90deg,#70b5ff,#85e3cb);transition:width .35s ease}
+.studio-footnote{display:block;color:#b4c2d5;font-size:.84rem;margin-top:12px}
+.studio-insight-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:27px 0}
+.studio-insight-grid>div{border-right:1px solid #34445d}
+.studio-insight-grid>div:last-child{border:0}
+.studio-insight-grid strong{display:block;font-size:clamp(1.4rem,2.5vw,2rem);font-variant-numeric:tabular-nums;color:#f7f9ff;letter-spacing:-.04em}
+.studio-insight-grid span{display:block;font-size:.78rem;color:#b4c2d5;margin-top:5px}
+.studio-progress-link{border:0;background:none;color:#94c5ff;font-weight:800;cursor:pointer;padding:10px 0;text-align:left}
+.studio-progress-link:hover{text-decoration:underline}
+#screen-home .continue-card{background:linear-gradient(115deg,#244b79,#1a3556);border:1px solid #5b91ca}
+#screen-home .continue-card .eyebrow{color:#a5d8ff}
+#screen-home .continue-card .continue-title{color:#fff}
+#screen-home .continue-card .muted{color:#d0e0f3}
+#screen-home .continue-card .adaptive-meta span{color:#e8f3ff}
+#screen-home .continue-card .btn.primary{background:#e7f5ff;color:#102d4a;border-color:transparent}
+#screen-home .continue-card .btn.primary:hover{background:#fff}
+body[data-theme="light"] .studio-goal,body[data-theme="light"] .studio-insights{background:linear-gradient(145deg,#eaf2ff,#fff);border-color:#cbdaf0;box-shadow:0 12px 30px #244b7912}
+body[data-theme="light"] .studio-goal>strong,body[data-theme="light"] .studio-insight-grid strong{color:#14253b}
+body[data-theme="light"] .studio-goal p,body[data-theme="light"] .studio-footnote,body[data-theme="light"] .studio-insight-grid span{color:#50647d}
+body[data-theme="light"] .studio-meter{background:#d7e3f4}
+body[data-theme="light"] .studio-insight-grid>div{border-color:#d7e3f4}
+@media(max-width:760px){.studio-intro{padding:18px 0}.studio-dashboard{grid-template-columns:1fr}.studio-goal,.studio-insights{padding:22px;border-radius:20px}.studio-insight-grid{margin:18px 0}.studio-insights{padding-bottom:14px}}
+@media(max-width:420px){.studio-goal,.studio-insights{padding:18px}.studio-insight-grid strong{font-size:1.5rem}.studio-insight-grid span{font-size:.72rem}}
+@media(prefers-reduced-motion:reduce){.studio-meter>span{transition:none}}
