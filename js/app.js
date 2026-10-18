@@ -221,6 +221,8 @@
       $("btn-weak").onclick = () => startWeakPractice(weak);
     }
   }
+  $("studio-start").addEventListener("click", startAdaptivePractice);
+  $("marketing-start").addEventListener("click", () => { $("profile-entry").scrollIntoView({behavior:"smooth",block:"start"}); $("new-name").focus({preventScroll:true}); });
   $("nav-lessons").addEventListener("click", () => go("lessons"));
   $("nav-games").addEventListener("click", () => go("games"));
   $("nav-progress").addEventListener("click", () => go("progress"));
