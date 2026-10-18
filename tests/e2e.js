@@ -100,6 +100,9 @@ function check(name, cond) {
     check("profile created with little-kid level", (await profile()).settings.level === "little");
     check("home screen shown", await page.$eval("#screen-home", (e) => e.classList.contains("active")));
     check("dark mode is default", await page.$eval("body",e=>e.dataset.theme==="dark"));
+    check("Studio milestone uses actual adaptive stage", await page.$eval("#studio-goal-title",e=>e.textContent.trim().length>0));
+    check("Studio progress meter is valid", await page.$eval("#studio-meter",e=>Number(e.getAttribute("aria-valuenow"))>=0 && Number(e.getAttribute("aria-valuenow"))<=100));
+    check("Studio dashboard displays learner metrics", await page.$eval(".studio-insight-grid",e=>!!e));
     const contrast = await page.evaluate(()=>{
       const rgb=s=>{const m=s.match(/[0-9]+(?:[.][0-9]+)?/g)||[];return m.slice(0,3).map(Number)};
       const luminance=arr=>arr.map(v=>{v/=255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4)}).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
