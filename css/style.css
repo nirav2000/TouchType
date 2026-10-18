@@ -719,3 +719,62 @@ body[data-theme="light"] .studio-insight-grid>div{border-color:#d7e3f4}
 @media(max-width:760px){.studio-intro{padding:18px 0}.studio-dashboard{grid-template-columns:1fr}.studio-goal,.studio-insights{padding:22px;border-radius:20px}.studio-insight-grid{margin:18px 0}.studio-insights{padding-bottom:14px}}
 @media(max-width:420px){.studio-goal,.studio-insights{padding:18px}.studio-insight-grid strong{font-size:1.5rem}.studio-insight-grid span{font-size:.72rem}}
 @media(prefers-reduced-motion:reduce){.studio-meter>span{transition:none}}
+
+/* Commercial product presentation, inspired by the actual Road to 1500 information architecture. */
+body[data-theme="dark"]{background:#0c1420!important}
+#app{max-width:1320px;padding-inline:clamp(16px,4vw,52px)}
+.topbar{min-height:76px;position:relative;z-index:2}
+.topbar .brand{font-size:1.35rem;letter-spacing:-.045em}
+.topbar .brand span{color:var(--ink)}
+#screen-profiles .marketing-hero{min-height:560px;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(300px,1fr);align-items:center;gap:30px;padding:72px clamp(22px,4vw,56px);border-radius:26px;background:#f6f6f0;position:relative;overflow:hidden;color:#19232c}
+#screen-profiles .marketing-copy{position:relative;z-index:1}
+.marketing-pill{display:inline-flex;align-items:center;gap:8px;padding:12px 19px;border:1px solid #b7d9ce;border-radius:100px;color:#0d795d;font-weight:650;font-size:.94rem;background:#ffffffa6}
+.marketing-copy h1{font-size:clamp(3rem,5.5vw,5.5rem);letter-spacing:-.07em;line-height:1.04;margin:32px 0 26px;max-width:740px}
+.marketing-copy h1 em,.studio-intro h1 em{font-style:normal;color:#087f65}
+.marketing-copy p{font-size:clamp(1.05rem,1.5vw,1.27rem);line-height:1.8;color:#596370;max-width:620px;margin-bottom:30px}
+.marketing-actions{display:flex;align-items:center;gap:22px;flex-wrap:wrap;color:#6a7480;font-size:.88rem}
+.marketing-cta,.studio-main-cta{border:0;border-radius:12px;padding:17px 28px;min-height:56px;background:linear-gradient(105deg,#087e64,#078d9f);color:#fff;font-size:1rem;font-weight:750;cursor:pointer;box-shadow:0 12px 24px #078c8026;transition:transform .15s,box-shadow .15s}
+.marketing-cta:hover,.studio-main-cta:hover{transform:translateY(-2px);box-shadow:0 15px 28px #078c8040}
+.marketing-art{min-height:430px;position:relative;display:grid;place-items:center;isolation:isolate}
+.marketing-art:before{content:"";position:absolute;width:90%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,#e3e9dd 0,#e9eee9 35%,transparent 72%);filter:blur(6px)}
+.art-orbit{position:absolute;width:80%;aspect-ratio:1;border:1px solid #bdd7cc;border-radius:50%;transform:rotate(-25deg) scaleY(.65)}
+.art-orbit-two{width:62%;transform:rotate(30deg) scaleY(.85)}
+.art-keys{display:flex;gap:12px;transform:rotate(-11deg);filter:drop-shadow(18px 25px 18px #34594a35)}
+.art-keys span{display:grid;place-items:center;width:clamp(68px,8vw,115px);aspect-ratio:1;border-radius:22px;background:linear-gradient(145deg,#fff,#e7e9df);border:1px solid #d5ded4;box-shadow:inset 0 -10px 0 #c8d2c7,0 18px 25px #183e3433;color:#087f65;font-size:clamp(2rem,4vw,3.5rem);font-weight:800}
+.art-keys span:nth-child(2){transform:translateY(-28px);color:#1a2835}
+.art-keys span:nth-child(3){transform:translateY(28px);background:linear-gradient(145deg,#0f9c82,#066e61);color:white;box-shadow:inset 0 -10px 0 #055a50,0 18px 25px #183e3433}
+.art-caption{position:absolute;bottom:12px;right:14px;color:#1c7967;font-size:.85rem;letter-spacing:.14em;font-weight:750;text-transform:uppercase}
+.marketing-benefits{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;padding:35px 0 48px}
+.marketing-benefits>div{padding:24px;border:1px solid #28364a;border-radius:18px;background:#151f2c}
+.marketing-benefits span{display:block;color:#7cd0b6;font-size:.82rem;font-weight:800;margin-bottom:12px}
+.marketing-benefits strong{display:block;font-size:1.12rem;margin-bottom:9px}
+.marketing-benefits p{color:#a7b4c5;font-size:.94rem;margin:0}
+.profile-entry{max-width:760px;margin:0 auto 55px;scroll-margin-top:25px}
+#screen-profiles .profile-entry>.big-title{text-align:center;font-size:clamp(1.8rem,3vw,2.5rem);letter-spacing:-.04em;margin:16px 0 25px}
+#screen-home .studio-intro{display:grid;grid-template-columns:1.15fr .85fr;align-items:center;min-height:390px;padding:55px clamp(26px,5vw,65px);border-radius:24px;background:#f5f6f0;color:#18232a;position:relative;overflow:hidden;margin:20px 0 26px}
+#screen-home .studio-intro .studio-kicker{color:#0b7c65}
+#screen-home .studio-intro h1{font-size:clamp(2.8rem,5vw,5rem);line-height:1.05;letter-spacing:-.065em;margin:18px 0 16px;max-width:650px}
+#screen-home .studio-intro .studio-lead{color:#3c4b55;font-size:1.14rem;margin:0 0 8px}
+.studio-description{color:#66717a;font-size:1rem;line-height:1.6;max-width:480px;margin-bottom:23px}
+.studio-intro-art{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transform:rotate(-9deg);padding:20px}
+.studio-key-row{display:flex;gap:12px}
+.studio-key-row.second{transform:translateX(24px)}
+.studio-key-row span{width:clamp(44px,5vw,72px);aspect-ratio:1;display:grid;place-items:center;border-radius:15px;border:1px solid #d0dcd5;background:#fff;box-shadow:inset 0 -7px #d1dcd5,0 12px 20px #0a50351c;color:#156e5b;font-weight:800;font-size:1.6rem}
+.studio-key-row.second span{background:#d9eae2}
+.studio-art-note{font-size:.7rem;color:#0c7e68;letter-spacing:.18em;font-weight:800;margin-top:18px}
+#screen-home .studio-dashboard{grid-template-columns:1.5fr 1fr}
+#screen-home .studio-goal,#screen-home .studio-insights{background:#182333;border:1px solid #293c4b}
+#screen-home .continue-card{background:#143e3b;border:1px solid #2e7d70}
+#screen-home .continue-card .btn.primary{background:#fff;color:#12564d}
+#screen-home .method-card{background:#151f2b}
+#screen-home .nav-grid{margin-top:18px}
+#screen-home .nav-card{background:#182333}
+#screen-home .home-utility-nav{margin-top:25px}
+#screen-home .studio-goal>strong{color:#fff}
+#screen-home .studio-meter>span{background:#24b998}
+body[data-theme="light"] #screen-home .studio-goal,body[data-theme="light"] #screen-home .studio-insights{background:#eaf3f0;border-color:#c6dcd3}
+body[data-theme="light"] #screen-home .studio-goal>strong,body[data-theme="light"] #screen-home .studio-insight-grid strong{color:#173d34}
+body[data-theme="light"] #screen-home .studio-goal p,body[data-theme="light"] #screen-home .studio-footnote,body[data-theme="light"] #screen-home .studio-insight-grid span{color:#506c64}
+@media(max-width:850px){#screen-profiles .marketing-hero{grid-template-columns:1fr;padding:48px 30px}.marketing-art{min-height:250px}.marketing-benefits{grid-template-columns:1fr}#screen-home .studio-intro{grid-template-columns:1fr;padding:38px 30px}.studio-intro-art{display:none}}
+@media(max-width:540px){#screen-profiles .marketing-hero{padding:40px 23px;min-height:0}.marketing-copy h1{font-size:clamp(2.8rem,11vw,4rem)}.marketing-art{min-height:185px}.art-keys span{width:64px}.marketing-actions{align-items:flex-start;flex-direction:column}#screen-home .studio-intro{padding:32px 22px;min-height:0}#screen-home .studio-intro h1{font-size:clamp(2.5rem,10vw,3.4rem)}}
+@media(prefers-reduced-motion:reduce){.marketing-cta,.studio-main-cta{transition:none}.marketing-cta:hover,.studio-main-cta:hover{transform:none}}
