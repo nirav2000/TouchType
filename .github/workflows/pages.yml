@@ -1,27 +1,58 @@
-name: Deploy to GitHub Pages
+name: Verify and release TouchType
 
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'version-lab-data/**'
   workflow_dispatch:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: touchtype-release
+  cancel-in-progress: false
 
 jobs:
-  deploy:
+  verify:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
+
+  checkpoint:
+    needs: verify
+    if: ${{ !contains(github.event.head_commit.message, 'Version Lab checkpoint') }}
+    uses: nirav2000/Apps/.github/workflows/version-lab-release.yml@main
+    with:
+      title: TouchType Studio
+      summary: Verified responsive Studio dashboard with personalised learning milestones and retained learner data.
+      areas: 'Learning journey::feature::Personalised Studio dashboard|Visual design::ui::Responsive visual refresh|Quality::test::Verified browser journeys'
+    permissions:
+      contents: write
+
+  deploy:
+    needs: [verify, checkpoint]
+    if: ${{ always() && needs.verify.result == 'success' && (needs.checkpoint.result == 'success' || needs.checkpoint.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
